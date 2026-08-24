@@ -1,0 +1,25 @@
+{
+  "version": "9.4",
+  "goal": "original limited-animation Indian dialogue-comedy production grammar",
+  "quality_targets": {
+    "target_mean_microshot_seconds": 3.5,
+    "microshots_per_scene_min": 2,
+    "microshots_per_scene_target": 3,
+    "reaction_zoom": 1.28,
+    "speaker_zoom": 1.15,
+    "wide_zoom": 1.03,
+    "idle_motion_px": 2.5,
+    "speaker_bob_px": 5.0,
+    "chase_travel_px": 2300,
+    "mouth_window_ms": 90,
+    "max_mouth_windows_per_line": 30
+  },
+  "quality_preserving_performance": [
+    "one FFmpeg encode per scene",
+    "camera micro-shots are one zoompan filter, not separate clips",
+    "motion uses overlay expressions instead of regenerated frames",
+    "mouth activity extracted from already-created WAV",
+    "no extra LLM calls",
+    "1080p24 encoder/voice mastering unchanged"
+  ]
+}

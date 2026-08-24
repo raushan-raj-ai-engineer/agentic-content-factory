@@ -1,0 +1,420 @@
+{
+  "version": "10.0.1",
+  "frame_width": 420,
+  "frame_height": 740,
+  "cycle_frames": 8,
+  "actions": [
+    "idle",
+    "talk",
+    "walk",
+    "walk_carry",
+    "run",
+    "run_carry",
+    "carry",
+    "point",
+    "grab",
+    "give",
+    "use_device",
+    "celebrate",
+    "reaction",
+    "jump",
+    "fall",
+    "magic"
+  ],
+  "cycle_fps": {
+    "idle": 3,
+    "talk": 5,
+    "walk": 8,
+    "walk_carry": 8,
+    "run": 12,
+    "run_carry": 12,
+    "carry": 4,
+    "point": 4,
+    "grab": 7,
+    "give": 7,
+    "use_device": 4,
+    "celebrate": 8,
+    "reaction": 4,
+    "jump": 8,
+    "fall": 7,
+    "magic": 7
+  },
+  "characters": {
+    "guddu": {
+      "articulated": true,
+      "kind": "human",
+      "child": true,
+      "skin": "#B97850",
+      "shirt": "#2C9CAA",
+      "pants": "#344D76",
+      "hair": "#241B18",
+      "shoe": "#302B2B",
+      "hair_style": "cap",
+      "accessory": "none"
+    },
+    "bittu": {
+      "articulated": true,
+      "kind": "human",
+      "child": true,
+      "skin": "#C78256",
+      "shirt": "#E9B83D",
+      "pants": "#58784A",
+      "hair": "#241B18",
+      "shoe": "#302B2B",
+      "hair_style": "cap",
+      "accessory": "none"
+    },
+    "chacha": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#AD704C",
+      "shirt": "#9B4E55",
+      "pants": "#E8E0D4",
+      "hair": "#3A302A",
+      "shoe": "#382F2D",
+      "hair_style": "cap",
+      "accessory": "moustache"
+    },
+    "mai": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B87857",
+      "shirt": "#9B4D91",
+      "pants": "#5C3869",
+      "hair": "#241B20",
+      "shoe": "#3D3038",
+      "hair_style": "bun",
+      "accessory": "bindi"
+    },
+    "babuji": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#A96D4A",
+      "shirt": "#78AFC8",
+      "pants": "#705546",
+      "hair": "#59514A",
+      "shoe": "#332D2A",
+      "hair_style": "short",
+      "accessory": "glasses_moustache"
+    },
+    "teacher": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B87C56",
+      "shirt": "#D9B46E",
+      "pants": "#5C5B62",
+      "hair": "#33251F",
+      "shoe": "#332D2A",
+      "hair_style": "short",
+      "accessory": "glasses"
+    },
+    "doctor": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B77955",
+      "shirt": "#F0F1EE",
+      "pants": "#456B83",
+      "hair": "#2C2421",
+      "shoe": "#30343A",
+      "hair_style": "short",
+      "accessory": "none",
+      "coat": true
+    },
+    "police": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#A86D4D",
+      "shirt": "#6D829B",
+      "pants": "#44576F",
+      "hair": "#2A2522",
+      "shoe": "#262B30",
+      "hair_style": "cap",
+      "accessory": "badge"
+    },
+    "astronaut": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B77955",
+      "shirt": "#E6ECEF",
+      "pants": "#DDE5EA",
+      "hair": "#47352C",
+      "shoe": "#727F8C",
+      "hair_style": "helmet",
+      "accessory": "none"
+    },
+    "robot": {
+      "articulated": true,
+      "kind": "robot",
+      "child": false,
+      "skin": "#AFC3CF",
+      "shirt": "#708CA0",
+      "pants": "#566B7C",
+      "hair": "#42515F",
+      "shoe": "#44515D",
+      "hair_style": "robot",
+      "accessory": "none"
+    },
+    "alien": {
+      "articulated": true,
+      "kind": "alien",
+      "child": false,
+      "skin": "#82C58E",
+      "shirt": "#579D69",
+      "pants": "#416D50",
+      "hair": "#39784A",
+      "shoe": "#31583C",
+      "hair_style": "alien",
+      "accessory": "none"
+    },
+    "chef": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B77955",
+      "shirt": "#F2EFE6",
+      "pants": "#59616A",
+      "hair": "#392B25",
+      "shoe": "#34302E",
+      "hair_style": "chef_hat",
+      "accessory": "moustache"
+    },
+    "athlete": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B5764F",
+      "shirt": "#C8504B",
+      "pants": "#384A67",
+      "hair": "#2A221F",
+      "shoe": "#30343A",
+      "hair_style": "short",
+      "accessory": "none"
+    },
+    "worker": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B5764F",
+      "shirt": "#6B98B4",
+      "pants": "#5B4E44",
+      "hair": "#32251F",
+      "shoe": "#302B29",
+      "hair_style": "short",
+      "accessory": "none"
+    },
+    "guest_child": {
+      "articulated": true,
+      "kind": "human",
+      "child": true,
+      "skin": "#C08058",
+      "shirt": "#E29E45",
+      "pants": "#55718E",
+      "hair": "#382721",
+      "shoe": "#312C2A",
+      "hair_style": "short",
+      "accessory": "none"
+    },
+    "guest_adult": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B87952",
+      "shirt": "#6DA574",
+      "pants": "#575D6B",
+      "hair": "#352722",
+      "shoe": "#302B2A",
+      "hair_style": "short",
+      "accessory": "none"
+    },
+    "wizard": {
+      "articulated": true,
+      "kind": "human",
+      "child": false,
+      "skin": "#B77955",
+      "shirt": "#6950A0",
+      "pants": "#514070",
+      "hair": "#E3E3DD",
+      "shoe": "#3B304D",
+      "hair_style": "wizard",
+      "accessory": "beard"
+    }
+  },
+  "prop_attachment": {
+    "suitcase": {
+      "depth": "behind",
+      "x": 260,
+      "y": 510,
+      "actions": [
+        "carry",
+        "walk",
+        "run",
+        "enter",
+        "exit",
+        "chase"
+      ]
+    },
+    "basket": {
+      "depth": "behind",
+      "x": 260,
+      "y": 490,
+      "actions": [
+        "carry",
+        "walk",
+        "run",
+        "enter",
+        "exit"
+      ]
+    },
+    "package_box": {
+      "depth": "front",
+      "x": 175,
+      "y": 360,
+      "actions": [
+        "carry",
+        "grab",
+        "give"
+      ]
+    },
+    "gift": {
+      "depth": "front",
+      "x": 175,
+      "y": 360,
+      "actions": [
+        "carry",
+        "grab",
+        "give"
+      ]
+    },
+    "phone": {
+      "depth": "front",
+      "x": 183,
+      "y": 350,
+      "actions": [
+        "use_device"
+      ]
+    },
+    "remote": {
+      "depth": "front",
+      "x": 185,
+      "y": 350,
+      "actions": [
+        "use_device",
+        "magic"
+      ]
+    },
+    "ticket": {
+      "depth": "front",
+      "x": 240,
+      "y": 340,
+      "actions": [
+        "give",
+        "grab",
+        "carry"
+      ]
+    },
+    "book": {
+      "depth": "front",
+      "x": 170,
+      "y": 360,
+      "actions": [
+        "carry",
+        "give",
+        "grab",
+        "use_device"
+      ]
+    },
+    "clipboard": {
+      "depth": "front",
+      "x": 170,
+      "y": 350,
+      "actions": [
+        "carry",
+        "give",
+        "use_device"
+      ]
+    },
+    "map": {
+      "depth": "front",
+      "x": 160,
+      "y": 350,
+      "actions": [
+        "carry",
+        "use_device",
+        "search"
+      ]
+    },
+    "wand": {
+      "depth": "front",
+      "x": 300,
+      "y": 250,
+      "actions": [
+        "magic",
+        "point"
+      ]
+    },
+    "microphone": {
+      "depth": "front",
+      "x": 275,
+      "y": 300,
+      "actions": [
+        "carry",
+        "talk"
+      ]
+    },
+    "camera": {
+      "depth": "front",
+      "x": 175,
+      "y": 345,
+      "actions": [
+        "use_device"
+      ]
+    }
+  },
+  "quality_contract": {
+    "sliding_only_motion_for_walk_run_allowed": false,
+    "prop_floating_allowed": false,
+    "broken_disconnected_human_limbs_allowed": false,
+    "attached_prop_max_socket_error_pixels": 18,
+    "one_ffmpeg_encode_per_scene": true,
+    "runtime_pillow_required": false,
+    "extra_llm_calls": 0,
+    "apng_runtime_allowed": false,
+    "wide_sprite_sheet_runtime_allowed": false,
+    "png_sequence_runtime_required": true,
+    "locomotion_min_distinct_frames": 8,
+    "gesture_min_distinct_frames": 3
+  },
+  "transport": {
+    "body_cycle_format": "numbered_png_sequence",
+    "runtime_apng_allowed": false,
+    "runtime_wide_sprite_sheet_allowed": false,
+    "runtime_pillow_required": false,
+    "frame_pattern": "frame_%02d.png",
+    "action_frame_counts": {
+      "carry": 3,
+      "celebrate": 8,
+      "fall": 8,
+      "give": 8,
+      "grab": 7,
+      "idle": 3,
+      "jump": 7,
+      "magic": 8,
+      "point": 3,
+      "reaction": 3,
+      "run": 8,
+      "run_carry": 8,
+      "talk": 8,
+      "use_device": 3,
+      "walk": 8,
+      "walk_carry": 8
+    },
+    "reason": "Small numbered PNG frames avoid APNG decoder incompatibilities and wide-sheet memory spikes while preserving native articulation."
+  }
+}

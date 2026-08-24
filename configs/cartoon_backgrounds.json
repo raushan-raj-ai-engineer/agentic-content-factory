@@ -1,0 +1,133 @@
+{
+  "version": 9.5,
+  "backgrounds": [
+    {
+      "id": "courtyard",
+      "label": "Family courtyard"
+    },
+    {
+      "id": "living_room",
+      "label": "Simple family living room"
+    },
+    {
+      "id": "tea_shop",
+      "label": "Neighborhood tea shop"
+    },
+    {
+      "id": "village_road",
+      "label": "Village/town road"
+    },
+    {
+      "id": "market",
+      "label": "Local market"
+    },
+    {
+      "id": "classroom",
+      "label": "School classroom"
+    },
+    {
+      "id": "office",
+      "label": "Small office"
+    },
+    {
+      "id": "bus_stop",
+      "label": "Local bus stop"
+    },
+    {
+      "id": "bedroom",
+      "label": "Simple bedroom"
+    },
+    {
+      "id": "rooftop",
+      "label": "House rooftop"
+    },
+    {
+      "id": "outdoor_kitchen",
+      "description": "Bihari outdoor cooking corner"
+    },
+    {
+      "id": "mango_tree",
+      "description": "Village mango tree"
+    },
+    {
+      "id": "village_lane",
+      "description": "Small-town Bihar lane"
+    },
+    {
+      "id": "school_yard",
+      "description": "School courtyard"
+    },
+    {
+      "id": "playground",
+      "description": "Kids playground"
+    },
+    {
+      "id": "forest_path",
+      "description": "Playful forest path"
+    },
+    {
+      "id": "festival_ground",
+      "description": "Village mela ground"
+    },
+    {
+      "id": "hospital",
+      "description": "Hospital/clinic room"
+    },
+    {
+      "id": "airport",
+      "description": "Airport terminal"
+    },
+    {
+      "id": "train_station",
+      "description": "Railway platform"
+    },
+    {
+      "id": "restaurant",
+      "description": "Restaurant dining room"
+    },
+    {
+      "id": "kitchen",
+      "description": "General kitchen"
+    },
+    {
+      "id": "farm",
+      "description": "Farm/field"
+    },
+    {
+      "id": "beach",
+      "description": "Beach"
+    },
+    {
+      "id": "space_station",
+      "description": "Space station / spacecraft"
+    },
+    {
+      "id": "laboratory",
+      "description": "Science laboratory"
+    },
+    {
+      "id": "castle",
+      "description": "Fantasy castle hall"
+    },
+    {
+      "id": "sports_field",
+      "description": "Sports ground"
+    },
+    {
+      "id": "park",
+      "description": "Public park"
+    },
+    {
+      "id": "city_street",
+      "description": "City street"
+    },
+    {
+      "id": "shop",
+      "description": "Retail shop"
+    },
+    {
+      "id": "police_station",
+      "description": "Police station"
+    }
+  ]
+}

@@ -1,0 +1,444 @@
+{
+  "version": "9.2",
+  "selection_rule": "Weighted primary route + secondary semantic tags; unknown topics use general_comedy.",
+  "routes": [
+    {
+      "id": "animal_comedy",
+      "audience": "kids_family",
+      "keywords": [
+        "monkey",
+        "bandar",
+        "बंदर",
+        "बंदरवा",
+        "dog",
+        "cat",
+        "goat",
+        "bakri",
+        "बकरी",
+        "tota",
+        "तोता",
+        "animal",
+        "bakra",
+        "बकरा"
+      ],
+      "tags": [
+        "animal",
+        "physical_comedy",
+        "chase"
+      ],
+      "locations": [
+        "courtyard",
+        "mango_tree",
+        "village_lane",
+        "market"
+      ],
+      "pacing": "fast_visual"
+    },
+    {
+      "id": "kids_comedy",
+      "audience": "kids",
+      "keywords": [
+        "kids",
+        "kid",
+        "child",
+        "children",
+        "bachcha",
+        "baccha",
+        "बच्चा",
+        "बच्चे",
+        "naughty",
+        "masti",
+        "शरारत"
+      ],
+      "tags": [
+        "kids",
+        "visual_comedy",
+        "simple_conflict"
+      ],
+      "locations": [
+        "courtyard",
+        "playground",
+        "bedroom",
+        "village_lane"
+      ],
+      "pacing": "fast_visual"
+    },
+    {
+      "id": "school_comedy",
+      "audience": "kids_teens",
+      "keywords": [
+        "school",
+        "teacher",
+        "class",
+        "classroom",
+        "exam",
+        "homework",
+        "student",
+        "स्कूल",
+        "टीचर",
+        "क्लास",
+        "परीक्षा",
+        "होमवर्क"
+      ],
+      "tags": [
+        "school",
+        "friends",
+        "misunderstanding"
+      ],
+      "locations": [
+        "classroom",
+        "school_yard",
+        "bus_stop",
+        "courtyard"
+      ],
+      "pacing": "fast_dialogue"
+    },
+    {
+      "id": "magic_fantasy",
+      "audience": "kids_family",
+      "keywords": [
+        "magic",
+        "magical",
+        "jadui",
+        "जादुई",
+        "wizard",
+        "ghost",
+        "bhoot",
+        "भूत",
+        "invisible",
+        "गायब",
+        "remote",
+        "pencil",
+        "robot",
+        "wish"
+      ],
+      "tags": [
+        "magic",
+        "transformation",
+        "visual_gags"
+      ],
+      "locations": [
+        "bedroom",
+        "courtyard",
+        "rooftop",
+        "forest_path"
+      ],
+      "pacing": "high_event"
+    },
+    {
+      "id": "adventure_chase",
+      "audience": "kids_family",
+      "keywords": [
+        "adventure",
+        "treasure",
+        "hunt",
+        "chase",
+        "escape",
+        "lost",
+        "map",
+        "खजाना",
+        "पीछा",
+        "भाग",
+        "जंगल",
+        "mission",
+        "bhaag",
+        "bhag",
+        "daud",
+        "daur",
+        "pakad",
+        "pakde",
+        "peecha",
+        "pichha"
+      ],
+      "tags": [
+        "adventure",
+        "chase",
+        "goal"
+      ],
+      "locations": [
+        "village_lane",
+        "forest_path",
+        "market",
+        "rooftop"
+      ],
+      "pacing": "high_event"
+    },
+    {
+      "id": "mystery",
+      "audience": "kids_family",
+      "keywords": [
+        "mystery",
+        "secret",
+        "missing",
+        "who stole",
+        "chor",
+        "चोर",
+        "रहस्य",
+        "गायब",
+        "किसने",
+        "detective",
+        "clue"
+      ],
+      "tags": [
+        "mystery",
+        "clues",
+        "reveal"
+      ],
+      "locations": [
+        "living_room",
+        "courtyard",
+        "market",
+        "village_lane"
+      ],
+      "pacing": "clue_reveal"
+    },
+    {
+      "id": "food_comedy",
+      "audience": "kids_family",
+      "keywords": [
+        "litti",
+        "लिट्टी",
+        "samosa",
+        "jalebi",
+        "rasgulla",
+        "thekua",
+        "food",
+        "खाना",
+        "मिठाई",
+        "चोखा",
+        "mango",
+        "आम"
+      ],
+      "tags": [
+        "food",
+        "local_flavor",
+        "physical_comedy"
+      ],
+      "locations": [
+        "outdoor_kitchen",
+        "courtyard",
+        "market",
+        "village_lane"
+      ],
+      "pacing": "fast_visual"
+    },
+    {
+      "id": "village_comedy",
+      "audience": "family",
+      "keywords": [
+        "village",
+        "gaon",
+        "गाँव",
+        "गांव",
+        "bihar",
+        "bihari",
+        "magahi",
+        "मगही",
+        "देहात",
+        "टोला"
+      ],
+      "tags": [
+        "village",
+        "local_flavor",
+        "community"
+      ],
+      "locations": [
+        "courtyard",
+        "village_lane",
+        "tea_shop",
+        "market"
+      ],
+      "pacing": "dialogue_visual_mix"
+    },
+    {
+      "id": "friendship",
+      "audience": "kids_teens",
+      "keywords": [
+        "friend",
+        "friendship",
+        "dost",
+        "दोस्त",
+        "यारी",
+        "best friend",
+        "guddu bittu"
+      ],
+      "tags": [
+        "friends",
+        "teamwork",
+        "banter"
+      ],
+      "locations": [
+        "courtyard",
+        "playground",
+        "tea_shop",
+        "village_lane"
+      ],
+      "pacing": "banter"
+    },
+    {
+      "id": "festival_culture",
+      "audience": "family",
+      "keywords": [
+        "holi",
+        "diwali",
+        "chhath",
+        "छठ",
+        "होली",
+        "दिवाली",
+        "festival",
+        "पूजा",
+        "mela",
+        "मेला",
+        "wedding",
+        "shaadi",
+        "शादी"
+      ],
+      "tags": [
+        "culture",
+        "festival",
+        "ensemble"
+      ],
+      "locations": [
+        "festival_ground",
+        "courtyard",
+        "market",
+        "village_lane"
+      ],
+      "pacing": "ensemble"
+    },
+    {
+      "id": "family_comedy",
+      "audience": "family",
+      "keywords": [
+        "parent",
+        "parents",
+        "family",
+        "mother",
+        "father",
+        "mai",
+        "babuji",
+        "घर",
+        "माँ",
+        "बाबूजी",
+        "पापा",
+        "career",
+        "marriage"
+      ],
+      "tags": [
+        "family",
+        "banter",
+        "generation_gap"
+      ],
+      "locations": [
+        "living_room",
+        "courtyard",
+        "tea_shop",
+        "market"
+      ],
+      "pacing": "dialogue_visual_mix"
+    },
+    {
+      "id": "workplace_comedy",
+      "audience": "teens_adults",
+      "keywords": [
+        "office",
+        "boss",
+        "meeting",
+        "interview",
+        "employee",
+        "work",
+        "ऑफिस",
+        "बॉस",
+        "मीटिंग",
+        "नौकरी"
+      ],
+      "tags": [
+        "workplace",
+        "social_comedy",
+        "misunderstanding"
+      ],
+      "locations": [
+        "office",
+        "tea_shop",
+        "bus_stop",
+        "living_room"
+      ],
+      "pacing": "dialogue"
+    },
+    {
+      "id": "slice_of_life",
+      "audience": "all",
+      "keywords": [
+        "daily",
+        "everyday",
+        "morning",
+        "wifi",
+        "phone",
+        "shopping",
+        "routine",
+        "रोज",
+        "सुबह",
+        "मोबाइल",
+        "बाजार"
+      ],
+      "tags": [
+        "daily_life",
+        "relatable",
+        "small_problem"
+      ],
+      "locations": [
+        "living_room",
+        "market",
+        "bus_stop",
+        "courtyard"
+      ],
+      "pacing": "relatable"
+    },
+    {
+      "id": "wholesome_moral",
+      "audience": "kids_family",
+      "keywords": [
+        "moral",
+        "lesson",
+        "help",
+        "kindness",
+        "share",
+        "honest",
+        "सीख",
+        "मदद",
+        "ईमानदार",
+        "बाँटना",
+        "दयालु"
+      ],
+      "tags": [
+        "wholesome",
+        "lesson",
+        "emotion"
+      ],
+      "locations": [
+        "courtyard",
+        "village_lane",
+        "classroom",
+        "market"
+      ],
+      "pacing": "warm"
+    },
+    {
+      "id": "general_comedy",
+      "audience": "all",
+      "keywords": [],
+      "tags": [
+        "comedy",
+        "misunderstanding",
+        "reaction"
+      ],
+      "locations": [
+        "courtyard",
+        "living_room",
+        "market",
+        "village_lane"
+      ],
+      "pacing": "balanced"
+    }
+  ]
+}

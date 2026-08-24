@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "../../Documents/AI/llm_engineering"
+		},
+		{
+			"path": "../../Documents/sdet-practice-app"
+		},
+		{
+			"path": "../../Documents/AegisQA"
+		},
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../ai-testing-lab"
+		}
+	],
+	"settings": {}
+}

@@ -1,0 +1,27 @@
+{
+  "version": "15.0",
+  "verified_date": "2026-08-22",
+  "purpose": "Safe fallback trend themes for original Indian comedy when live Google Trends refresh is unavailable.",
+  "sources": [
+    "https://trends.google.com/trending?geo=IN",
+    "https://about.fb.com/news/2026/06/reels-is-shaping-indias-video-first-future-across-gen-z-women-bharat/",
+    "https://blog.google/intl/en-in/products/platforms/2025s-biggest-trends-on-youtube-that-gave-india-a-new-shared-vernacular/"
+  ],
+  "safe_theme_seeds": [
+    "sports-match fever",
+    "school / exam / holiday confusion",
+    "new phone / gadget obsession",
+    "flight / airport / travel chaos",
+    "online shopping / sale temptation",
+    "weather / monsoon family chaos",
+    "AI assistant misunderstandings",
+    "UPI / digital-payment family confusion",
+    "wedding / relative / family-group chaos",
+    "office / work-from-home misunderstandings"
+  ],
+  "rules": [
+    "Use trends only as situation inspiration.",
+    "Generate original jokes; never reproduce viral captions, creator punchlines, film dialogue or meme text.",
+    "Exclude political, tragedy, crime and dangerous-challenge trends from automatic comedy seeding."
+  ]
+}

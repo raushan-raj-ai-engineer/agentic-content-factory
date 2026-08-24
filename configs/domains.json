@@ -1,0 +1,856 @@
+{
+  "version": 8,
+  "min_score": 5.0,
+  "ambiguity_margin": 1.5,
+  "domains": [
+    {
+      "name": "sports",
+      "family": "factual_real_media",
+      "high": [
+        " vs ",
+        " versus ",
+        "football",
+        "soccer",
+        "cricket",
+        "ipl",
+        "fifa",
+        "uefa",
+        "league",
+        "match",
+        "fixture",
+        "kickoff",
+        "goal",
+        "wicket",
+        "innings",
+        "tournament",
+        "विश्व कप",
+        "मैच",
+        "क्रिकेट",
+        "फुटबॉल",
+        "badminton",
+        "tennis",
+        "hockey",
+        "basketball",
+        "baseball",
+        "volleyball",
+        "athletics",
+        "olympics",
+        "world championship",
+        "world championships",
+        "grand slam",
+        "boxing",
+        "wrestling",
+        "formula 1",
+        "f1 race"
+      ],
+      "medium": [
+        "player",
+        "coach",
+        "stadium",
+        "semifinal",
+        "quarterfinal",
+        "final score",
+        "team",
+        "championship",
+        "championships",
+        "medal",
+        "seeded",
+        "singles",
+        "doubles",
+        "round of 16"
+      ],
+      "negative": [
+        "video game",
+        "gameplay"
+      ]
+    },
+    {
+      "name": "legal",
+      "family": "factual_editorial",
+      "high": [
+        "review petition",
+        "supreme court",
+        "high court",
+        "writ petition",
+        "judgment",
+        "judgement",
+        "tribunal",
+        "constitutional",
+        "lawsuit",
+        "verdict",
+        "appeal",
+        "court order",
+        "याचिका",
+        "सुप्रीम कोर्ट",
+        "हाई कोर्ट",
+        "न्यायालय"
+      ],
+      "medium": [
+        "court",
+        "judge",
+        "hearing",
+        "legal",
+        "law",
+        "petition",
+        "appellant",
+        "respondent",
+        "counsel",
+        "litigation"
+      ],
+      "negative": [
+        "court shoe",
+        "tennis court",
+        "basketball court"
+      ]
+    },
+    {
+      "name": "finance",
+      "family": "data_finance",
+      "high": [
+        "stock market",
+        "share price",
+        "stock price",
+        "market cap",
+        "nasdaq",
+        "sensex",
+        "nifty",
+        "dow jones",
+        "india vix",
+        "earnings",
+        "bitcoin",
+        "crypto",
+        "index fund",
+        "शेयर बाजार",
+        "सेंसेक्स",
+        "निफ्टी"
+      ],
+      "medium": [
+        "stocks",
+        "shares",
+        "revenue",
+        "profit",
+        "investor",
+        "dividend",
+        "ipo",
+        "bond",
+        "mutual fund"
+      ],
+      "negative": [
+        "product price",
+        "launch price",
+        "ticket price",
+        "menu price"
+      ]
+    },
+    {
+      "name": "business",
+      "family": "factual_real_media",
+      "high": [
+        "acquisition",
+        "merger",
+        "startup funding",
+        "company results",
+        "business expansion",
+        "ceo",
+        "layoffs",
+        "enterprise deal"
+      ],
+      "medium": [
+        "company",
+        "startup",
+        "business",
+        "industry",
+        "sales",
+        "restructuring",
+        "workforce"
+      ],
+      "negative": []
+    },
+    {
+      "name": "politics",
+      "family": "factual_real_media",
+      "high": [
+        "election",
+        "parliament",
+        "lok sabha",
+        "rajya sabha",
+        "prime minister",
+        "chief minister",
+        "political party",
+        "cabinet",
+        "campaign",
+        "मतदान",
+        "चुनाव",
+        "लोकसभा"
+      ],
+      "medium": [
+        "minister",
+        "government",
+        "opposition",
+        "policy debate",
+        "bill passed",
+        "party leader"
+      ],
+      "negative": [
+        "movie election scene"
+      ]
+    },
+    {
+      "name": "public_service",
+      "family": "factual_real_media",
+      "high": [
+        "government scheme",
+        "yojana",
+        "beneficiary",
+        "ration card",
+        "aadhaar update",
+        "pension scheme",
+        "subsidy",
+        "anganwadi",
+        "अंगणवाडी",
+        "आंगनवाड़ी",
+        "योजना",
+        "सरकारी योजना",
+        "लाभार्थी",
+        "पेंशन"
+      ],
+      "medium": [
+        "portal",
+        "application status",
+        "government portal",
+        "department",
+        "citizen service"
+      ],
+      "negative": []
+    },
+    {
+      "name": "education",
+      "family": "factual_real_media",
+      "high": [
+        "scholarship",
+        "admission",
+        "admissions",
+        "university",
+        "college",
+        "school",
+        "exam result",
+        "merit list",
+        "fee reimbursement",
+        "financial aid",
+        "student eligibility",
+        "छात्रवृत्ति",
+        "शिक्षा",
+        "परीक्षा",
+        "रिजल्ट",
+        "प्रवेश"
+      ],
+      "medium": [
+        "student",
+        "students",
+        "academic",
+        "eligibility",
+        "application form",
+        "education portal",
+        "semester"
+      ],
+      "negative": [
+        "student discount earbuds",
+        "student edition laptop"
+      ]
+    },
+    {
+      "name": "career",
+      "family": "factual_real_media",
+      "high": [
+        "job vacancy",
+        "job vacancies",
+        "recruitment",
+        "hiring",
+        "government jobs",
+        "interview",
+        "resume",
+        "career",
+        "भर्ती",
+        "नौकरी",
+        "रोजगार"
+      ],
+      "medium": [
+        "job",
+        "jobs",
+        "salary",
+        "role",
+        "skills",
+        "candidate",
+        "application deadline"
+      ],
+      "negative": [
+        "movie role",
+        "acting role"
+      ]
+    },
+    {
+      "name": "product",
+      "family": "product_cinematic",
+      "high": [
+        "earbuds",
+        "earbud",
+        "tws",
+        "headphones",
+        "smartphone",
+        "laptop",
+        "tablet",
+        "smartwatch",
+        "camera",
+        "speaker",
+        "keyboard",
+        "mouse",
+        "charger",
+        "power bank",
+        "router",
+        "anc",
+        "noise cancellation",
+        "battery life",
+        "bluetooth",
+        "driver",
+        "low latency",
+        "launch price"
+      ],
+      "medium": [
+        "gadget",
+        "device review",
+        "specifications",
+        "specs",
+        "charging case",
+        "display",
+        "processor",
+        "chipset"
+      ],
+      "negative": [
+        "stock price",
+        "share price",
+        "company earnings",
+        "government device scheme"
+      ]
+    },
+    {
+      "name": "technical",
+      "family": "technical",
+      "high": [
+        "playwright",
+        "selenium",
+        "javascript",
+        "python",
+        "api",
+        "database",
+        "architecture",
+        "source code",
+        "github",
+        "docker",
+        "kubernetes",
+        "server",
+        "software testing"
+      ],
+      "medium": [
+        "code",
+        "terminal",
+        "command",
+        "framework",
+        "frontend",
+        "backend",
+        "integration",
+        "deployment"
+      ],
+      "negative": [
+        "movie code name"
+      ]
+    },
+    {
+      "name": "entertainment",
+      "family": "factual_real_media",
+      "high": [
+        "movie",
+        "film",
+        "box office",
+        "trailer",
+        "actor",
+        "actress",
+        "director",
+        "cinema",
+        "bollywood",
+        "tollywood",
+        "mollywood",
+        "web series",
+        "ott release",
+        "rajnikanth",
+        "rajinikanth",
+        "फिल्म",
+        "सिनेमा",
+        "अभिनेता",
+        "ट्रेलर",
+        "telenovela",
+        "soap opera",
+        "tv series",
+        "television series",
+        "streaming series",
+        "novela brasileira",
+        "série de televisão",
+        "serie de televisión",
+        "série télévisée",
+        "sinetron",
+        "ドラマ",
+        "مسلسل",
+        "ধারাবাহিক",
+        "ڈرامہ"
+      ],
+      "medium": [
+        "celebrity",
+        "release date",
+        "cast",
+        "song",
+        "album",
+        "singer",
+        "music video",
+        "novela",
+        "serie",
+        "série",
+        "series",
+        "episode",
+        "episodes",
+        "episódio",
+        "episodio",
+        "capítulo",
+        "capitulo",
+        "capítulo da novela",
+        "television",
+        "tv show"
+      ],
+      "negative": [
+        "film capacitor",
+        "thin film"
+      ]
+    },
+    {
+      "name": "gaming",
+      "family": "creative",
+      "high": [
+        "video game",
+        "gameplay",
+        "playstation",
+        "xbox",
+        "nintendo",
+        "steam",
+        "gta",
+        "fortnite",
+        "minecraft",
+        "esports"
+      ],
+      "medium": [
+        "gaming",
+        "game update",
+        "boss fight",
+        "console"
+      ],
+      "negative": [
+        "football game",
+        "cricket game"
+      ]
+    },
+    {
+      "name": "automotive",
+      "family": "factual_real_media",
+      "high": [
+        "car launch",
+        "bike launch",
+        "electric vehicle",
+        "ev range",
+        "suv",
+        "sedan",
+        "hatchback",
+        "motorcycle",
+        "scooter",
+        "car review",
+        "bike review"
+      ],
+      "medium": [
+        "car",
+        "vehicle",
+        "engine",
+        "mileage",
+        "fuel economy",
+        "horsepower",
+        "torque"
+      ],
+      "negative": [
+        "car insurance stock",
+        "movie car scene"
+      ]
+    },
+    {
+      "name": "travel",
+      "family": "factual_real_media",
+      "high": [
+        "travel guide",
+        "tourism",
+        "tourist",
+        "hotel",
+        "flight",
+        "airport",
+        "visa",
+        "destination",
+        "itinerary",
+        "beach",
+        "national park",
+        "trip to"
+      ],
+      "medium": [
+        "travel",
+        "trip",
+        "vacation",
+        "resort",
+        "city guide",
+        "places to visit"
+      ],
+      "negative": [
+        "travel stock",
+        "business trip earnings"
+      ]
+    },
+    {
+      "name": "health",
+      "family": "factual_editorial",
+      "high": [
+        "health advisory",
+        "disease",
+        "symptoms",
+        "treatment",
+        "vaccine",
+        "hospital",
+        "medical",
+        "doctor",
+        "medicine",
+        "mental health",
+        "nutrition",
+        "स्वास्थ्य",
+        "बीमारी"
+      ],
+      "medium": [
+        "health",
+        "wellness",
+        "fitness",
+        "diet",
+        "sleep",
+        "exercise",
+        "infection"
+      ],
+      "negative": [
+        "company health stock"
+      ]
+    },
+    {
+      "name": "science",
+      "family": "factual_real_media",
+      "high": [
+        "nasa",
+        "isro",
+        "space mission",
+        "satellite",
+        "rocket",
+        "scientists",
+        "research study",
+        "astronomy",
+        "physics",
+        "chemistry",
+        "biology",
+        "चंद्रयान",
+        "इसरो"
+      ],
+      "medium": [
+        "science",
+        "researchers",
+        "study finds",
+        "laboratory",
+        "experiment",
+        "telescope"
+      ],
+      "negative": [
+        "science fiction movie"
+      ]
+    },
+    {
+      "name": "environment",
+      "family": "factual_real_media",
+      "high": [
+        "climate change",
+        "air quality",
+        "aqi",
+        "pollution",
+        "heatwave",
+        "cyclone",
+        "flood",
+        "earthquake",
+        "wildfire",
+        "weather alert",
+        "monsoon",
+        "मौसम",
+        "बाढ़",
+        "चक्रवात"
+      ],
+      "medium": [
+        "weather",
+        "rainfall",
+        "temperature",
+        "environment",
+        "storm",
+        "drought"
+      ],
+      "negative": []
+    },
+    {
+      "name": "food",
+      "family": "lifestyle_real_media",
+      "high": [
+        "recipe",
+        "cooking",
+        "restaurant",
+        "dish",
+        "food review",
+        "mustard oil",
+        "edible oil",
+        "खाद्य तेल",
+        "रेसिपी",
+        "खाना",
+        "व्यंजन"
+      ],
+      "medium": [
+        "food",
+        "kitchen",
+        "ingredients",
+        "taste",
+        "chef",
+        "breakfast",
+        "lunch",
+        "dinner"
+      ],
+      "negative": [
+        "food company stock",
+        "food inflation"
+      ]
+    },
+    {
+      "name": "real_estate",
+      "family": "factual_real_media",
+      "high": [
+        "real estate",
+        "property market",
+        "home loan",
+        "mortgage",
+        "apartment",
+        "housing project",
+        "property price",
+        "house buying"
+      ],
+      "medium": [
+        "property",
+        "housing",
+        "flat",
+        "rent",
+        "builder"
+      ],
+      "negative": [
+        "real estate stock"
+      ]
+    },
+    {
+      "name": "history_culture",
+      "family": "factual_real_media",
+      "high": [
+        "history of",
+        "historical",
+        "ancient",
+        "empire",
+        "dynasty",
+        "archaeology",
+        "heritage",
+        "museum",
+        "culture",
+        "tradition",
+        "इतिहास",
+        "संस्कृति",
+        "विरासत"
+      ],
+      "medium": [
+        "history",
+        "cultural",
+        "civilization",
+        "monument"
+      ],
+      "negative": [
+        "historical movie",
+        "historical film"
+      ]
+    },
+    {
+      "name": "religion_spirituality",
+      "family": "factual_real_media",
+      "high": [
+        "temple",
+        "mosque",
+        "church",
+        "gurudwara",
+        "pilgrimage",
+        "festival ritual",
+        "spiritual",
+        "religious",
+        "मंदिर",
+        "पूजा",
+        "तीर्थ",
+        "धर्म"
+      ],
+      "medium": [
+        "faith",
+        "devotional",
+        "prayer",
+        "festival"
+      ],
+      "negative": []
+    },
+    {
+      "name": "astrology",
+      "family": "creative",
+      "high": [
+        "horoscope",
+        "zodiac",
+        "astrology",
+        "aquarius",
+        "aries",
+        "taurus",
+        "gemini",
+        "cancer",
+        "leo",
+        "virgo",
+        "libra",
+        "scorpio",
+        "sagittarius",
+        "capricorn",
+        "pisces",
+        "राशिफल",
+        "राशि",
+        "वृश्चिक",
+        "कुंभ",
+        "मेष"
+      ],
+      "medium": [
+        "birth chart",
+        "planetary",
+        "retrograde",
+        "moon sign"
+      ],
+      "negative": [
+        "astronomy",
+        "nasa"
+      ]
+    },
+    {
+      "name": "fashion_beauty",
+      "family": "lifestyle_real_media",
+      "high": [
+        "fashion",
+        "beauty",
+        "makeup",
+        "skincare",
+        "haircare",
+        "outfit",
+        "style guide",
+        "cosmetics",
+        "fragrance"
+      ],
+      "medium": [
+        "style",
+        "beauty tips",
+        "grooming",
+        "dress",
+        "shoe"
+      ],
+      "negative": [
+        "fashion company stock"
+      ]
+    },
+    {
+      "name": "agriculture",
+      "family": "factual_real_media",
+      "high": [
+        "farmer",
+        "farming",
+        "agriculture",
+        "crop",
+        "mandi",
+        "fertilizer",
+        "irrigation",
+        "kisan",
+        "किसान",
+        "खेती",
+        "फसल",
+        "मंडी"
+      ],
+      "medium": [
+        "farm",
+        "harvest",
+        "seed",
+        "rural"
+      ],
+      "negative": [
+        "farm game"
+      ]
+    },
+    {
+      "name": "crime_safety",
+      "family": "factual_editorial",
+      "high": [
+        "crime",
+        "murder",
+        "fraud",
+        "scam",
+        "cybercrime",
+        "police investigation",
+        "arrested",
+        "security alert",
+        "safety warning",
+        "ठगी",
+        "घोटाला",
+        "पुलिस"
+      ],
+      "medium": [
+        "investigation",
+        "arrest",
+        "victim",
+        "suspect",
+        "safety"
+      ],
+      "negative": [
+        "crime thriller movie",
+        "crime film"
+      ]
+    },
+    {
+      "name": "creative",
+      "family": "creative",
+      "high": [
+        "cartoon",
+        "animated story",
+        "fictional character",
+        "kids story",
+        "children's story",
+        "fantasy story",
+        "anime style"
+      ],
+      "medium": [
+        "animation",
+        "fiction",
+        "story character"
+      ],
+      "negative": [
+        "animated chart"
+      ]
+    }
+  ]
+}

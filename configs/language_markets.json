@@ -1,0 +1,236 @@
+{
+  "version": 8.4,
+  "scoring": {
+    "discovery_language_share": 0.18,
+    "trend_final_language_share": 0.12,
+    "max_candidates_per_language": 2,
+    "default_market_count": 10
+  },
+  "languages": [
+    {
+      "code": "en",
+      "name": "English",
+      "priority_rank": 1,
+      "priority_weight": 1.0
+    },
+    {
+      "code": "hi",
+      "name": "Hindi",
+      "priority_rank": 2,
+      "priority_weight": 0.96
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "priority_rank": 3,
+      "priority_weight": 0.93
+    },
+    {
+      "code": "pt",
+      "name": "Portuguese",
+      "priority_rank": 4,
+      "priority_weight": 0.9
+    },
+    {
+      "code": "id",
+      "name": "Indonesian",
+      "priority_rank": 5,
+      "priority_weight": 0.89
+    },
+    {
+      "code": "ja",
+      "name": "Japanese",
+      "priority_rank": 6,
+      "priority_weight": 0.82
+    },
+    {
+      "code": "ar",
+      "name": "Arabic",
+      "priority_rank": 7,
+      "priority_weight": 0.78
+    },
+    {
+      "code": "bn",
+      "name": "Bengali",
+      "priority_rank": 8,
+      "priority_weight": 0.75
+    },
+    {
+      "code": "fr",
+      "name": "French",
+      "priority_rank": 9,
+      "priority_weight": 0.74
+    },
+    {
+      "code": "ur",
+      "name": "Urdu",
+      "priority_rank": 10,
+      "priority_weight": 0.72
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "priority_rank": 11,
+      "priority_weight": 0.7
+    },
+    {
+      "code": "vi",
+      "name": "Vietnamese",
+      "priority_rank": 12,
+      "priority_weight": 0.68
+    },
+    {
+      "code": "tr",
+      "name": "Turkish",
+      "priority_rank": 13,
+      "priority_weight": 0.66
+    },
+    {
+      "code": "ta",
+      "name": "Tamil",
+      "priority_rank": 14,
+      "priority_weight": 0.64
+    },
+    {
+      "code": "te",
+      "name": "Telugu",
+      "priority_rank": 15,
+      "priority_weight": 0.63
+    },
+    {
+      "code": "mr",
+      "name": "Marathi",
+      "priority_rank": 16,
+      "priority_weight": 0.62
+    },
+    {
+      "code": "pa",
+      "name": "Punjabi",
+      "priority_rank": 17,
+      "priority_weight": 0.6
+    },
+    {
+      "code": "gu",
+      "name": "Gujarati",
+      "priority_rank": 18,
+      "priority_weight": 0.58
+    },
+    {
+      "code": "kn",
+      "name": "Kannada",
+      "priority_rank": 19,
+      "priority_weight": 0.58
+    },
+    {
+      "code": "ml",
+      "name": "Malayalam",
+      "priority_rank": 20,
+      "priority_weight": 0.56
+    },
+    {
+      "code": "ru",
+      "name": "Russian",
+      "priority_rank": 21,
+      "priority_weight": 0.5
+    },
+    {
+      "code": "zh",
+      "name": "Mandarin Chinese",
+      "priority_rank": 22,
+      "priority_weight": 0.2,
+      "note": "Large speaker base but low direct YouTube accessibility in mainland China."
+    }
+  ],
+  "markets": [
+    {
+      "geo": "IN",
+      "name": "India",
+      "default_language": "hi",
+      "latin_language": "en",
+      "youtube_ad_reach_m": 500.0,
+      "news_hl": "en-IN",
+      "news_ceid": "IN:en"
+    },
+    {
+      "geo": "US",
+      "name": "United States",
+      "default_language": "en",
+      "latin_language": "en",
+      "youtube_ad_reach_m": 254.0,
+      "news_hl": "en-US",
+      "news_ceid": "US:en"
+    },
+    {
+      "geo": "ID",
+      "name": "Indonesia",
+      "default_language": "id",
+      "latin_language": "id",
+      "youtube_ad_reach_m": 151.0,
+      "news_hl": "id",
+      "news_ceid": "ID:id"
+    },
+    {
+      "geo": "BR",
+      "name": "Brazil",
+      "default_language": "pt",
+      "latin_language": "pt",
+      "youtube_ad_reach_m": 150.0,
+      "news_hl": "pt-BR",
+      "news_ceid": "BR:pt-419"
+    },
+    {
+      "geo": "MX",
+      "name": "Mexico",
+      "default_language": "es",
+      "latin_language": "es",
+      "youtube_ad_reach_m": 85.0,
+      "news_hl": "es-419",
+      "news_ceid": "MX:es-419"
+    },
+    {
+      "geo": "JP",
+      "name": "Japan",
+      "default_language": "ja",
+      "latin_language": "ja",
+      "youtube_ad_reach_m": 78.5,
+      "news_hl": "ja",
+      "news_ceid": "JP:ja"
+    },
+    {
+      "geo": "PK",
+      "name": "Pakistan",
+      "default_language": "ur",
+      "latin_language": "ur",
+      "youtube_ad_reach_m": 54.3,
+      "news_hl": "ur",
+      "news_ceid": "PK:ur"
+    },
+    {
+      "geo": "FR",
+      "name": "France",
+      "default_language": "fr",
+      "latin_language": "fr",
+      "youtube_ad_reach_m": 51.5,
+      "news_hl": "fr",
+      "news_ceid": "FR:fr"
+    },
+    {
+      "geo": "BD",
+      "name": "Bangladesh",
+      "default_language": "bn",
+      "latin_language": "bn",
+      "youtube_ad_reach_m": 49.8,
+      "news_hl": "bn",
+      "news_ceid": "BD:bn"
+    },
+    {
+      "geo": "SA",
+      "name": "Saudi Arabia",
+      "default_language": "ar",
+      "latin_language": "ar",
+      "youtube_ad_reach_m": 27.5,
+      "news_hl": "ar",
+      "news_ceid": "SA:ar"
+    }
+  ]
+}

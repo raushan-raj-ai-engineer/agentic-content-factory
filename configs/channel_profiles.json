@@ -1,0 +1,52 @@
+{
+  "version": "15.0",
+  "default_by_language": {
+    "english": "global_english",
+    "hindi": "hindi_mass",
+    "hinglish": "hindi_mass",
+    "magahi": "hindi_mass",
+    "bhojpuri": "hindi_mass"
+  },
+  "channels": {
+    "hindi_mass": {
+      "label": "Hindi / Indian Mass",
+      "audience_region": "India + Hindi belt + diaspora",
+      "humor_style": "trend-aware original Indian situational comedy with recurring character personalities, fast setup/escalation/reaction/callback structure, natural Hindi/Hinglish/Magahi/Bhojpuri dialogue",
+      "preferred_cast": [
+        "guddu",
+        "bittu",
+        "mai",
+        "babuji",
+        "chacha"
+      ],
+      "background_family": "indian_natural",
+      "avoid": [
+        "forced English slang",
+        "documentary tone",
+        "PPT exposition"
+      ],
+      "comedy_director": "indian_comedy_v15",
+      "trend_refresh": "safe themes from Google Trends India; 12h cache; offline fallback",
+      "audio_profile": "hindi_mass_audio_v15"
+    },
+    "global_english": {
+      "label": "Global English (US/UK/EU)",
+      "audience_region": "United States, United Kingdom, Europe and global English audience",
+      "humor_style": "fast globally relatable family, school, pet, work, travel and awkward-situation comedy",
+      "preferred_cast": [
+        "guest_child",
+        "guest_adult",
+        "bittu",
+        "teacher",
+        "doctor"
+      ],
+      "background_family": "global_neutral",
+      "avoid": [
+        "forced Indian honorifics",
+        "India-only career stereotypes",
+        "literal translated English",
+        "region-specific slang unless topic asks"
+      ]
+    }
+  }
+}

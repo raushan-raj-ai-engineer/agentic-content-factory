@@ -1,0 +1,23 @@
+{
+  "code": "hinglish",
+  "display_name": "Hinglish",
+  "script": "Latin",
+  "region_hint": "Urban / digital India",
+  "voice_locale_preferences": [
+    "hi_IN",
+    "en_IN"
+  ],
+  "native_writing_rule": "Write naturally spoken Hinglish in Roman script. Mix Hindi and English only where a real speaker would. Do not alternate languages mechanically sentence by sentence.",
+  "humor_guidance": [
+    "urban Indian comedy",
+    "office/school/family banter",
+    "internet culture where relevant",
+    "reaction comedy"
+  ],
+  "address_examples": [
+    "bhai",
+    "chacha",
+    "mummy",
+    "papa"
+  ]
+}

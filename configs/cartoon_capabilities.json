@@ -1,0 +1,1217 @@
+{
+  "version": "9.5.1",
+  "goal": "Broad topic coverage without retraining or per-topic hardcoded packs. Resolve story worlds, cast archetypes, visual entities, actions and props deterministically, then render with capability-aware fallbacks.",
+  "worlds": [
+    {
+      "id": "home",
+      "keywords": [
+        "home",
+        "house",
+        "family",
+        "घर",
+        "मकान"
+      ],
+      "backgrounds": [
+        "living_room",
+        "courtyard",
+        "bedroom"
+      ],
+      "cast": [
+        "guddu",
+        "bittu",
+        "mai",
+        "babuji"
+      ],
+      "props": [
+        "phone",
+        "cup"
+      ]
+    },
+    {
+      "id": "school",
+      "keywords": [
+        "school",
+        "teacher",
+        "student",
+        "classroom",
+        "homework",
+        "exam",
+        "स्कूल",
+        "टीचर",
+        "क्लास",
+        "होमवर्क",
+        "परीक्षा"
+      ],
+      "backgrounds": [
+        "classroom",
+        "school_yard"
+      ],
+      "cast": [
+        "teacher",
+        "guest_child",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "book",
+        "school_bag"
+      ]
+    },
+    {
+      "id": "hospital",
+      "keywords": [
+        "hospital",
+        "doctor",
+        "nurse",
+        "patient",
+        "clinic",
+        "medicine",
+        "अस्पताल",
+        "डॉक्टर",
+        "नर्स",
+        "दवा"
+      ],
+      "backgrounds": [
+        "hospital"
+      ],
+      "cast": [
+        "doctor",
+        "guest_adult",
+        "guddu"
+      ],
+      "props": [
+        "stethoscope",
+        "medicine",
+        "clipboard"
+      ]
+    },
+    {
+      "id": "office",
+      "keywords": [
+        "office",
+        "boss",
+        "employee",
+        "meeting",
+        "interview",
+        "work",
+        "ऑफिस",
+        "बॉस",
+        "मीटिंग",
+        "इंटरव्यू"
+      ],
+      "backgrounds": [
+        "office"
+      ],
+      "cast": [
+        "worker",
+        "guest_adult",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "laptop",
+        "phone",
+        "clipboard"
+      ]
+    },
+    {
+      "id": "airport",
+      "keywords": [
+        "airport",
+        "flight",
+        "plane",
+        "airplane",
+        "boarding",
+        "एयरपोर्ट",
+        "फ्लाइट",
+        "हवाई जहाज"
+      ],
+      "backgrounds": [
+        "airport"
+      ],
+      "cast": [
+        "guest_adult",
+        "worker",
+        "guddu"
+      ],
+      "props": [
+        "suitcase",
+        "ticket",
+        "phone"
+      ]
+    },
+    {
+      "id": "railway",
+      "keywords": [
+        "train",
+        "railway",
+        "station",
+        "platform",
+        "ट्रेन",
+        "रेलवे",
+        "स्टेशन",
+        "प्लेटफॉर्म"
+      ],
+      "backgrounds": [
+        "train_station"
+      ],
+      "cast": [
+        "guest_adult",
+        "worker",
+        "guddu"
+      ],
+      "props": [
+        "suitcase",
+        "ticket"
+      ]
+    },
+    {
+      "id": "restaurant",
+      "keywords": [
+        "restaurant",
+        "cafe",
+        "hotel food",
+        "waiter",
+        "chef",
+        "रेस्टोरेंट",
+        "कैफे",
+        "खाना"
+      ],
+      "backgrounds": [
+        "restaurant",
+        "kitchen"
+      ],
+      "cast": [
+        "chef",
+        "guest_adult",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "plate",
+        "cup"
+      ]
+    },
+    {
+      "id": "farm",
+      "keywords": [
+        "farm",
+        "farmer",
+        "field",
+        "cow",
+        "tractor",
+        "खेत",
+        "किसान",
+        "गाय",
+        "ट्रैक्टर"
+      ],
+      "backgrounds": [
+        "farm"
+      ],
+      "cast": [
+        "worker",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "broom",
+        "basket"
+      ]
+    },
+    {
+      "id": "beach",
+      "keywords": [
+        "beach",
+        "sea",
+        "ocean",
+        "sand",
+        "समुद्र",
+        "बीच"
+      ],
+      "backgrounds": [
+        "beach"
+      ],
+      "cast": [
+        "guddu",
+        "bittu",
+        "guest_child"
+      ],
+      "props": [
+        "ball",
+        "camera"
+      ]
+    },
+    {
+      "id": "city",
+      "keywords": [
+        "city",
+        "street",
+        "traffic",
+        "shopping",
+        "mall",
+        "shop",
+        "market",
+        "शहर",
+        "सड़क",
+        "दुकान",
+        "बाजार"
+      ],
+      "backgrounds": [
+        "city_street",
+        "shop",
+        "market"
+      ],
+      "cast": [
+        "guest_adult",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "phone",
+        "package_box",
+        "money"
+      ]
+    },
+    {
+      "id": "police",
+      "keywords": [
+        "police",
+        "cop",
+        "crime",
+        "thief",
+        "detective",
+        "पुलिस",
+        "चोर",
+        "जासूस"
+      ],
+      "backgrounds": [
+        "police_station",
+        "city_street"
+      ],
+      "cast": [
+        "police",
+        "guest_adult",
+        "guddu"
+      ],
+      "props": [
+        "clipboard",
+        "key"
+      ]
+    },
+    {
+      "id": "sports",
+      "keywords": [
+        "sport",
+        "football",
+        "soccer",
+        "cricket",
+        "match",
+        "stadium",
+        "game",
+        "खेल",
+        "क्रिकेट",
+        "फुटबॉल",
+        "मैच"
+      ],
+      "backgrounds": [
+        "sports_field"
+      ],
+      "cast": [
+        "athlete",
+        "guest_child",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "ball"
+      ]
+    },
+    {
+      "id": "science",
+      "keywords": [
+        "lab",
+        "laboratory",
+        "science",
+        "experiment",
+        "scientist",
+        "research",
+        "लैब",
+        "विज्ञान",
+        "प्रयोग"
+      ],
+      "backgrounds": [
+        "laboratory"
+      ],
+      "cast": [
+        "worker",
+        "robot",
+        "guddu"
+      ],
+      "props": [
+        "clipboard",
+        "robot_device"
+      ]
+    },
+    {
+      "id": "space",
+      "keywords": [
+        "space",
+        "planet",
+        "moon",
+        "mars",
+        "astronaut",
+        "rocket",
+        "spaceship",
+        "अंतरिक्ष",
+        "चाँद",
+        "मंगल",
+        "रॉकेट"
+      ],
+      "backgrounds": [
+        "space_station"
+      ],
+      "cast": [
+        "astronaut",
+        "robot",
+        "alien"
+      ],
+      "props": [
+        "robot_device",
+        "map"
+      ]
+    },
+    {
+      "id": "fantasy",
+      "keywords": [
+        "magic",
+        "wizard",
+        "castle",
+        "dragon",
+        "spell",
+        "fairy",
+        "जादू",
+        "जादुई",
+        "किला",
+        "जादूगर"
+      ],
+      "backgrounds": [
+        "castle",
+        "forest_path"
+      ],
+      "cast": [
+        "wizard",
+        "guest_child",
+        "alien"
+      ],
+      "props": [
+        "wand",
+        "map"
+      ]
+    },
+    {
+      "id": "animal",
+      "keywords": [
+        "dog",
+        "cat",
+        "puppy",
+        "kitten",
+        "goat",
+        "monkey",
+        "animal",
+        "कुत्ता",
+        "बिल्ली",
+        "बकरी",
+        "बंदर",
+        "जानवर"
+      ],
+      "backgrounds": [
+        "park",
+        "courtyard",
+        "farm"
+      ],
+      "cast": [
+        "guddu",
+        "bittu"
+      ],
+      "visual_entities": [
+        "dog",
+        "cat",
+        "bandar"
+      ],
+      "props": [
+        "ball"
+      ]
+    },
+    {
+      "id": "dinosaur",
+      "keywords": [
+        "dinosaur",
+        "dino",
+        "jurassic",
+        "डायनासोर"
+      ],
+      "backgrounds": [
+        "forest_path",
+        "park"
+      ],
+      "cast": [
+        "guest_child",
+        "guddu"
+      ],
+      "visual_entities": [
+        "dinosaur"
+      ],
+      "props": [
+        "map"
+      ]
+    },
+    {
+      "id": "park",
+      "keywords": [
+        "park",
+        "garden",
+        "playground",
+        "पार्क",
+        "बगीचा"
+      ],
+      "backgrounds": [
+        "park",
+        "playground"
+      ],
+      "cast": [
+        "guest_child",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "ball"
+      ]
+    },
+    {
+      "id": "stage",
+      "keywords": [
+        "stage",
+        "show",
+        "concert",
+        "dance",
+        "sing",
+        "music",
+        "स्टेज",
+        "शो",
+        "नाच",
+        "गाना"
+      ],
+      "backgrounds": [
+        "festival_ground"
+      ],
+      "cast": [
+        "guest_adult",
+        "athlete",
+        "guddu",
+        "bittu"
+      ],
+      "props": [
+        "microphone",
+        "camera"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "id": "teacher",
+      "keywords": [
+        "teacher",
+        "टीचर",
+        "sir",
+        "madam"
+      ]
+    },
+    {
+      "id": "doctor",
+      "keywords": [
+        "doctor",
+        "डॉक्टर"
+      ]
+    },
+    {
+      "id": "police",
+      "keywords": [
+        "police",
+        "cop",
+        "पुलिस"
+      ]
+    },
+    {
+      "id": "astronaut",
+      "keywords": [
+        "astronaut",
+        "अंतरिक्ष यात्री"
+      ]
+    },
+    {
+      "id": "robot",
+      "keywords": [
+        "robot",
+        "रोबोट"
+      ]
+    },
+    {
+      "id": "alien",
+      "keywords": [
+        "alien",
+        "एलियन"
+      ]
+    },
+    {
+      "id": "dinosaur",
+      "keywords": [
+        "dinosaur",
+        "dino",
+        "डायनासोर"
+      ]
+    },
+    {
+      "id": "chef",
+      "keywords": [
+        "chef",
+        "cook",
+        "शेफ",
+        "रसोइया"
+      ]
+    },
+    {
+      "id": "athlete",
+      "keywords": [
+        "player",
+        "athlete",
+        "footballer",
+        "cricketer",
+        "खिलाड़ी"
+      ]
+    },
+    {
+      "id": "worker",
+      "keywords": [
+        "employee",
+        "worker",
+        "scientist",
+        "staff",
+        "कर्मचारी",
+        "वैज्ञानिक"
+      ]
+    },
+    {
+      "id": "guest_child",
+      "keywords": [
+        "child",
+        "kid",
+        "student",
+        "boy",
+        "girl",
+        "बच्चा",
+        "बच्ची",
+        "छात्र"
+      ]
+    },
+    {
+      "id": "guest_adult",
+      "keywords": [
+        "man",
+        "woman",
+        "adult",
+        "customer",
+        "passenger",
+        "patient",
+        "आदमी",
+        "महिला",
+        "यात्री",
+        "मरीज"
+      ]
+    },
+    {
+      "id": "dog",
+      "keywords": [
+        "dog",
+        "puppy",
+        "कुत्ता"
+      ]
+    },
+    {
+      "id": "cat",
+      "keywords": [
+        "cat",
+        "kitten",
+        "बिल्ली"
+      ]
+    },
+    {
+      "id": "wizard",
+      "keywords": [
+        "wizard",
+        "magician",
+        "जादूगर"
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "chase",
+      "keywords": [
+        "chase",
+        "run after",
+        "पीछा",
+        "भाग",
+        "chases",
+        "chasing",
+        "chased"
+      ]
+    },
+    {
+      "id": "run",
+      "keywords": [
+        "run",
+        "running",
+        "दौड़",
+        "भाग रहा",
+        "runs",
+        "ran"
+      ]
+    },
+    {
+      "id": "walk",
+      "keywords": [
+        "walk",
+        "walking",
+        "चल",
+        "टहल",
+        "walks",
+        "walked"
+      ]
+    },
+    {
+      "id": "enter",
+      "keywords": [
+        "enter",
+        "arrive",
+        "comes in",
+        "आता है",
+        "प्रवेश",
+        "enters",
+        "entered",
+        "entering",
+        "arrives",
+        "arrived",
+        "arriving"
+      ]
+    },
+    {
+      "id": "exit",
+      "keywords": [
+        "exit",
+        "leave",
+        "goes away",
+        "चला जाता",
+        "निकल",
+        "exits",
+        "exited",
+        "leaves",
+        "left",
+        "leaving"
+      ]
+    },
+    {
+      "id": "grab",
+      "keywords": [
+        "grab",
+        "take",
+        "snatch",
+        "pick up",
+        "उठा",
+        "झपट",
+        "लेता है",
+        "grabs",
+        "grabbed",
+        "grabbing",
+        "takes",
+        "took",
+        "taking",
+        "snatches",
+        "snatched",
+        "picks up",
+        "picked up"
+      ]
+    },
+    {
+      "id": "carry",
+      "keywords": [
+        "carry",
+        "holding",
+        "लेकर",
+        "पकड़कर",
+        "carries",
+        "carried",
+        "carrying",
+        "holds"
+      ]
+    },
+    {
+      "id": "give",
+      "keywords": [
+        "give",
+        "share",
+        "hand over",
+        "देता",
+        "बाँट",
+        "बांट",
+        "gives",
+        "gave",
+        "giving",
+        "shares",
+        "shared",
+        "sharing"
+      ]
+    },
+    {
+      "id": "search",
+      "keywords": [
+        "search",
+        "find",
+        "look for",
+        "ढूँढ",
+        "खोज",
+        "searches",
+        "searched",
+        "searching",
+        "finds",
+        "found",
+        "looking for"
+      ]
+    },
+    {
+      "id": "hide",
+      "keywords": [
+        "hide",
+        "secretly",
+        "छिप",
+        "चुपके",
+        "hides",
+        "hid",
+        "hidden",
+        "hiding"
+      ]
+    },
+    {
+      "id": "open",
+      "keywords": [
+        "open",
+        "unlock",
+        "खोल",
+        "opens",
+        "opened",
+        "opening",
+        "unlocks",
+        "unlocked"
+      ]
+    },
+    {
+      "id": "use_device",
+      "keywords": [
+        "phone",
+        "mobile",
+        "laptop",
+        "remote",
+        "camera",
+        "फोन",
+        "मोबाइल",
+        "लैपटॉप",
+        "uses phone",
+        "using phone",
+        "checks phone",
+        "using laptop",
+        "uses remote"
+      ]
+    },
+    {
+      "id": "eat",
+      "keywords": [
+        "eat",
+        "food",
+        "lunch",
+        "dinner",
+        "खाना",
+        "खा",
+        "पीना",
+        "eats",
+        "ate",
+        "eating",
+        "drinks",
+        "drank",
+        "drinking"
+      ]
+    },
+    {
+      "id": "celebrate",
+      "keywords": [
+        "celebrate",
+        "win",
+        "happy",
+        "party",
+        "जीत",
+        "खुश",
+        "जश्न",
+        "celebrates",
+        "celebrated",
+        "celebrating",
+        "wins",
+        "won"
+      ]
+    },
+    {
+      "id": "dance",
+      "keywords": [
+        "dance",
+        "dancing",
+        "नाच",
+        "dances",
+        "danced"
+      ]
+    },
+    {
+      "id": "jump",
+      "keywords": [
+        "jump",
+        "leap",
+        "कूद",
+        "jumps",
+        "jumped",
+        "jumping",
+        "leaps",
+        "leaped"
+      ]
+    },
+    {
+      "id": "fall",
+      "keywords": [
+        "fall",
+        "slip",
+        "गिर",
+        "फिसल",
+        "falls",
+        "fell",
+        "fallen",
+        "falling",
+        "slips",
+        "slipped",
+        "slipping"
+      ]
+    },
+    {
+      "id": "magic",
+      "keywords": [
+        "magic",
+        "spell",
+        "transform",
+        "जादू",
+        "बदल",
+        "magical",
+        "transforms",
+        "transformed",
+        "transforming",
+        "casts spell"
+      ]
+    },
+    {
+      "id": "reveal",
+      "keywords": [
+        "reveal",
+        "discover",
+        "shows",
+        "पता चलता",
+        "दिखाता",
+        "reveals",
+        "revealed",
+        "revealing",
+        "discovers",
+        "discovered"
+      ]
+    },
+    {
+      "id": "point",
+      "keywords": [
+        "point",
+        "show there",
+        "इशारा",
+        "देखो",
+        "points",
+        "pointed",
+        "pointing"
+      ]
+    },
+    {
+      "id": "reaction",
+      "keywords": [
+        "reaction",
+        "shocked",
+        "surprise",
+        "हैरान",
+        "चौंक",
+        "reacts",
+        "reacted",
+        "reacting",
+        "surprised",
+        "shocking"
+      ]
+    }
+  ],
+  "props": [
+    {
+      "id": "phone",
+      "keywords": [
+        "phone",
+        "mobile",
+        "फोन",
+        "मोबाइल"
+      ]
+    },
+    {
+      "id": "book",
+      "keywords": [
+        "book",
+        "notebook",
+        "किताब",
+        "कॉपी"
+      ]
+    },
+    {
+      "id": "school_bag",
+      "keywords": [
+        "school bag",
+        "backpack",
+        "बैग"
+      ]
+    },
+    {
+      "id": "ball",
+      "keywords": [
+        "ball",
+        "football",
+        "cricket ball",
+        "गेंद"
+      ]
+    },
+    {
+      "id": "laptop",
+      "keywords": [
+        "laptop",
+        "computer",
+        "लैपटॉप",
+        "कंप्यूटर"
+      ]
+    },
+    {
+      "id": "package_box",
+      "keywords": [
+        "box",
+        "parcel",
+        "package",
+        "डिब्बा",
+        "पार्सल"
+      ]
+    },
+    {
+      "id": "gift",
+      "keywords": [
+        "gift",
+        "present",
+        "उपहार",
+        "गिफ्ट"
+      ]
+    },
+    {
+      "id": "key",
+      "keywords": [
+        "key",
+        "चाबी"
+      ]
+    },
+    {
+      "id": "map",
+      "keywords": [
+        "map",
+        "treasure map",
+        "नक्शा"
+      ]
+    },
+    {
+      "id": "medicine",
+      "keywords": [
+        "medicine",
+        "tablet",
+        "दवा"
+      ]
+    },
+    {
+      "id": "stethoscope",
+      "keywords": [
+        "stethoscope",
+        "स्टेथोस्कोप"
+      ]
+    },
+    {
+      "id": "microphone",
+      "keywords": [
+        "microphone",
+        "mic",
+        "माइक"
+      ]
+    },
+    {
+      "id": "camera",
+      "keywords": [
+        "camera",
+        "कैमरा"
+      ]
+    },
+    {
+      "id": "wand",
+      "keywords": [
+        "wand",
+        "magic stick",
+        "छड़ी",
+        "जादुई छड़ी"
+      ]
+    },
+    {
+      "id": "remote",
+      "keywords": [
+        "remote",
+        "रिमोट"
+      ]
+    },
+    {
+      "id": "suitcase",
+      "keywords": [
+        "suitcase",
+        "luggage",
+        "सूटकेस",
+        "सामान"
+      ]
+    },
+    {
+      "id": "ticket",
+      "keywords": [
+        "ticket",
+        "boarding pass",
+        "टिकट"
+      ]
+    },
+    {
+      "id": "cup",
+      "keywords": [
+        "cup",
+        "tea",
+        "coffee",
+        "कप",
+        "चाय",
+        "कॉफी"
+      ]
+    },
+    {
+      "id": "plate",
+      "keywords": [
+        "plate",
+        "food",
+        "थाली",
+        "प्लेट"
+      ]
+    },
+    {
+      "id": "money",
+      "keywords": [
+        "money",
+        "cash",
+        "rupee",
+        "पैसा",
+        "रुपया"
+      ]
+    },
+    {
+      "id": "broom",
+      "keywords": [
+        "broom",
+        "झाड़ू"
+      ]
+    },
+    {
+      "id": "basket",
+      "keywords": [
+        "basket",
+        "टोकरी"
+      ]
+    },
+    {
+      "id": "clipboard",
+      "keywords": [
+        "clipboard",
+        "report",
+        "file",
+        "रिपोर्ट",
+        "फाइल"
+      ]
+    },
+    {
+      "id": "robot_device",
+      "keywords": [
+        "robot device",
+        "scanner",
+        "gadget",
+        "device",
+        "गैजेट",
+        "डिवाइस"
+      ]
+    }
+  ],
+  "background_aliases": {
+    "clinic": "hospital",
+    "doctor_room": "hospital",
+    "hospital_room": "hospital",
+    "airport_terminal": "airport",
+    "plane_terminal": "airport",
+    "railway_station": "train_station",
+    "platform": "train_station",
+    "cafe": "restaurant",
+    "food_shop": "restaurant",
+    "science_lab": "laboratory",
+    "lab": "laboratory",
+    "space": "space_station",
+    "spaceship": "space_station",
+    "moon_base": "space_station",
+    "stadium": "sports_field",
+    "ground": "sports_field",
+    "street": "city_street",
+    "road": "city_street",
+    "store": "shop",
+    "mall": "shop",
+    "garden": "park",
+    "magic_castle": "castle"
+  },
+  "coverage_contract": {
+    "production_ready_mean_score": 0.82,
+    "production_ready_min_score": 0.68,
+    "max_partial_scene_ratio": 0.35,
+    "max_fallback_scene_ratio": 0.1,
+    "unknown_neutral_score_ceiling": 0.62,
+    "extra_llm_calls": 0,
+    "retraining_required": false
+  },
+  "market_aware_targets": {
+    "purpose": "Internal measurable production benchmark. Not a claim of outperforming any named commercial product.",
+    "arbitrary_topic_without_retraining": true,
+    "scene_level_multi_world_resolution": true,
+    "compositional_action_grammar": true,
+    "persistent_character_consistency": true,
+    "monetization_gate": true,
+    "channel_repetition_gate": true,
+    "quality_preserving_performance_logs": true
+  }
+}

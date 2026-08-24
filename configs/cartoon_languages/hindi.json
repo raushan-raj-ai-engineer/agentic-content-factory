@@ -1,0 +1,22 @@
+{
+  "code": "hindi",
+  "display_name": "Hindi",
+  "script": "Devanagari",
+  "region_hint": "India",
+  "voice_locale_preferences": [
+    "hi_IN"
+  ],
+  "native_writing_rule": "Write directly in natural conversational Hindi using Devanagari. Keep common proper nouns or genuinely natural English terms only where Hindi speakers normally use them.",
+  "humor_guidance": [
+    "Indian family banter",
+    "situational comedy",
+    "reaction comedy",
+    "everyday middle-class relatability"
+  ],
+  "address_examples": [
+    "भैया",
+    "चाचा",
+    "माँ",
+    "बाबूजी"
+  ]
+}

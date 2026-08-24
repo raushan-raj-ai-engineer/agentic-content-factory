@@ -1,0 +1,82 @@
+{
+  "version": "18.1",
+  "channel": "hindi_mass",
+  "accent_family": "consistent Indian Hindi-family",
+  "locale_priority": {
+    "hindi": [
+      "hi_IN",
+      "en_IN"
+    ],
+    "magahi": [
+      "hi_IN",
+      "en_IN"
+    ],
+    "bhojpuri": [
+      "hi_IN",
+      "en_IN"
+    ],
+    "hinglish": [
+      "en_IN",
+      "hi_IN"
+    ]
+  },
+  "preferred_macos_voices": {
+    "female": [
+      "Lekha",
+      "Isha"
+    ],
+    "male": [
+      "Rishi",
+      "Lekha"
+    ],
+    "default": [
+      "Lekha",
+      "Rishi",
+      "Isha"
+    ]
+  },
+  "mastering": {
+    "integrated_lufs": -14.0,
+    "true_peak_db": -1.0,
+    "lra": 6.5,
+    "highpass_hz": 72,
+    "lowpass_hz": 14500,
+    "presence_hz": 3200,
+    "presence_gain_db": 1.2,
+    "mud_cut_hz": 220,
+    "mud_cut_db": -1.4,
+    "sfx_volume": 0.13,
+    "air_hz": 8500,
+    "air_gain_db": 0.8
+  },
+  "audio_strategy": "single-stage clean master + stronger character identity + bounded emotion-aware prosody + wider subtle stereo depth",
+  "character_tone_factor": {
+    "guddu": 1.01,
+    "bittu": 1.075,
+    "babuji": 0.885,
+    "chacha": 0.94,
+    "mai": 1.025
+  },
+  "character_rate_factor": {
+    "guddu": 1.02,
+    "bittu": 1.07,
+    "babuji": 0.9,
+    "chacha": 0.95,
+    "mai": 0.98
+  },
+  "emotion_rate_factor": {
+    "neutral": 1.0,
+    "happy": 1.03,
+    "smirk": 0.98,
+    "angry": 1.04,
+    "shocked": 1.06,
+    "confused": 0.94,
+    "embarrassed": 0.96,
+    "laughing": 1.06,
+    "serious": 0.92,
+    "suspicious": 0.96,
+    "proud": 0.97,
+    "sad": 0.92,
+    "excited": 1.08
+  }
+}

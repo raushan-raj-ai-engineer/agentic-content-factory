@@ -1,0 +1,23 @@
+{
+  "code": "english",
+  "display_name": "English",
+  "script": "Latin",
+  "region_hint": "Global / India",
+  "voice_locale_preferences": [
+    "en_IN",
+    "en_US"
+  ],
+  "native_writing_rule": "Write directly in natural conversational English. Do not translate sentence-by-sentence from Hindi.",
+  "humor_guidance": [
+    "situational comedy",
+    "family banter",
+    "reaction comedy",
+    "misdirection and callback"
+  ],
+  "address_examples": [
+    "bro",
+    "uncle",
+    "mom",
+    "dad"
+  ]
+}

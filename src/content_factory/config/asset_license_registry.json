@@ -1,0 +1,27 @@
+{
+  "policy_snapshot_date": "2026-08-21",
+  "notes": [
+    "This registry is informational and is not legal advice.",
+    "Voice-model dataset/model licenses vary; review each MODEL_CARD before commercial use.",
+    "YouTube policy eligibility is separate from third-party asset/model licensing."
+  ],
+  "models": {
+    "stabilityai/sd-turbo": {
+      "status": "manual_review",
+      "reason": "Stability AI publishes commercial/community licensing terms; confirm the current license applies to your intended monetized use."
+    },
+    "en_US-libritts-high": {
+      "status": "model_card_reviewed",
+      "dataset_license": "CC BY 4.0",
+      "speakers": 904
+    },
+    "en_US-lessac-medium": {
+      "status": "manual_review",
+      "dataset_license": "See Lessac Blizzard 2013 dataset license linked from MODEL_CARD."
+    },
+    "hi_IN-rohan-medium": {
+      "status": "manual_review",
+      "dataset_license": "See IITM IndicTTS license linked from MODEL_CARD."
+    }
+  }
+}

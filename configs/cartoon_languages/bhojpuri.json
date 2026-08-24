@@ -1,0 +1,23 @@
+{
+  "code": "bhojpuri",
+  "display_name": "Bhojpuri",
+  "script": "Devanagari",
+  "region_hint": "Bihar / Eastern Uttar Pradesh",
+  "voice_locale_preferences": [
+    "bhojpuri",
+    "hi_IN"
+  ],
+  "native_writing_rule": "Write directly in natural conversational Bhojpuri, preferably Devanagari. Do not produce standard Hindi with a few Bhojpuri words. Use locally natural grammar and address forms while avoiding caricature.",
+  "humor_guidance": [
+    "family and neighborhood comedy",
+    "situational misunderstanding",
+    "quick verbal banter",
+    "reaction and callback comedy"
+  ],
+  "address_examples": [
+    "चाचा",
+    "माई",
+    "बाबूजी",
+    "भइया"
+  ]
+}

@@ -1,0 +1,46 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+.DS_Store
+*.pyc
+# Generated media artifacts
+artifacts/
+# Local AI models
+models/
+# Local/generated files
+.DS_Store
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+artifacts/
+logs/
+data/runs/
+.repair-backups/
+.cache/
+tmp/
+temp/
+outputs/
+
+# Large local cartoon sprite assets
+assets/cartoon_v9_1/sprites/
+
+# Local visual environment
+.visual-venv/
+
+# Local video engine runtime/cache/models
+.local-video-engine/
+
+# Downloaded voice model binaries
+models/piper/*.onnx
+
+# Large ML model binaries
+*.safetensors
+*.ckpt
+*.pth

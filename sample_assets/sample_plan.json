@@ -1,0 +1,32 @@
+{
+  "title": "V19 real-motion proof",
+  "topic": "बाबूजी AI की बात गलत समझकर कुशन जोर से झाड़ देते हैं",
+  "language_code": "hindi",
+  "language_name": "Hindi",
+  "genre": "family_comedy",
+  "route": "family_comedy",
+  "audience": "family",
+  "characters": ["babuji", "guddu"],
+  "scenes": [
+    {
+      "id": 1,
+      "location_id": "living_room",
+      "beat": "setup",
+      "shot_duration_seconds": 8.0,
+      "setup": "Babuji reads a phone AI instruction to dust the sofa cushion gently, but he confidently beats the cushion too hard and creates a visible dust cloud while Guddu reacts.",
+      "visual_action": "dust_cushion",
+      "dialogue": [
+        {
+          "character_id": "babuji",
+          "text": "ए गुड्डू, ई AI कहऽ हई कुशन हल्का झाड़ऽ। हम बतावत हिअइ सफाई कैसे होवऽ हई!",
+          "emotion": "proud"
+        },
+        {
+          "character_id": "guddu",
+          "text": "हल्का बाबूजी! ई त पूरा घर में धूर उड़ा देलऽ!",
+          "emotion": "shocked"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,701 @@
+{
+  "version": 9.5,
+  "originality_rule": "These are original house characters. Do not imitate or reproduce characters, costumes, catchphrases, logos, or backgrounds from a reference creator/channel.",
+  "characters": [
+    {
+      "id": "guddu",
+      "display_name": "Guddu",
+      "role": "young_lead",
+      "age_group": "young_adult",
+      "personality": [
+        "clever",
+        "lazy",
+        "good-hearted",
+        "quick-witted"
+      ],
+      "voice_role": "young_male",
+      "default_outfit": "simple_shirt_trousers",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "embarrassed",
+        "laughing"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "thinking",
+        "hands_up",
+        "shocked",
+        "sitting",
+        "walking"
+      ]
+    },
+    {
+      "id": "bittu",
+      "display_name": "Bittu",
+      "role": "comic_friend",
+      "age_group": "young_adult",
+      "personality": [
+        "overconfident",
+        "talkative",
+        "funny",
+        "loyal"
+      ],
+      "voice_role": "comic_young_male",
+      "default_outfit": "casual_tshirt_trousers",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "shocked",
+        "confused",
+        "proud",
+        "laughing"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "boasting",
+        "thinking",
+        "hands_up",
+        "walking"
+      ]
+    },
+    {
+      "id": "chacha",
+      "display_name": "Chacha",
+      "role": "comic_elder",
+      "age_group": "older_adult",
+      "personality": [
+        "loud",
+        "practical",
+        "stubborn",
+        "secretly_soft"
+      ],
+      "voice_role": "older_male",
+      "default_outfit": "kurta_pajama",
+      "expressions": [
+        "neutral",
+        "angry",
+        "suspicious",
+        "shocked",
+        "laughing",
+        "proud"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "scolding",
+        "hands_on_hips",
+        "sitting",
+        "walking"
+      ]
+    },
+    {
+      "id": "mai",
+      "display_name": "Mai",
+      "role": "mother",
+      "age_group": "adult",
+      "personality": [
+        "sharp",
+        "caring",
+        "practical",
+        "witty"
+      ],
+      "voice_role": "adult_female",
+      "default_outfit": "simple_saree",
+      "expressions": [
+        "neutral",
+        "smile",
+        "angry",
+        "suspicious",
+        "shocked",
+        "laughing"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "scolding",
+        "hands_on_hips",
+        "sitting"
+      ]
+    },
+    {
+      "id": "babuji",
+      "display_name": "Babuji",
+      "role": "father",
+      "age_group": "older_adult",
+      "personality": [
+        "serious",
+        "deadpan",
+        "traditional",
+        "witty"
+      ],
+      "voice_role": "older_male_calm",
+      "default_outfit": "shirt_dhoti_or_trousers",
+      "expressions": [
+        "neutral",
+        "serious",
+        "angry",
+        "confused",
+        "surprised",
+        "small_smile"
+      ],
+      "poses": [
+        "idle",
+        "reading",
+        "pointing",
+        "thinking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "bandar",
+      "display_name": "Bandar",
+      "role": "nonverbal_animal_comic",
+      "age_group": "animal",
+      "personality": [
+        "naughty",
+        "clever",
+        "expressive",
+        "soft-hearted"
+      ],
+      "voice_role": "animal_sfx",
+      "default_outfit": "none",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "running",
+        "jumping",
+        "climbing",
+        "holding_food",
+        "sitting"
+      ]
+    },
+    {
+      "id": "teacher",
+      "display_name": "Teacher",
+      "role": "teacher",
+      "age_group": "adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "formal_teacher",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "doctor",
+      "display_name": "Doctor",
+      "role": "doctor",
+      "age_group": "adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "medical_coat",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "police",
+      "display_name": "Police Officer",
+      "role": "police_officer",
+      "age_group": "adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "police_uniform",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "astronaut",
+      "display_name": "Astronaut",
+      "role": "astronaut",
+      "age_group": "adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "space_suit",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "robot",
+      "display_name": "Robot",
+      "role": "robot",
+      "age_group": "machine",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "robot_body",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "alien",
+      "display_name": "Alien",
+      "role": "alien",
+      "age_group": "fantasy",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "alien_body",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "dinosaur",
+      "display_name": "Dinosaur",
+      "role": "nonverbal_dinosaur",
+      "age_group": "animal",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "nonverbal",
+      "default_outfit": "none",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "chef",
+      "display_name": "Chef",
+      "role": "chef",
+      "age_group": "adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "chef_uniform",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "athlete",
+      "display_name": "Athlete",
+      "role": "athlete",
+      "age_group": "young_adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "sports_uniform",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "worker",
+      "display_name": "Worker",
+      "role": "worker_professional",
+      "age_group": "adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "work_clothes",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "guest_child",
+      "display_name": "Child",
+      "role": "child_guest",
+      "age_group": "child",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "casual_child",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "guest_adult",
+      "display_name": "Adult",
+      "role": "adult_guest",
+      "age_group": "adult",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "casual_adult",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "dog",
+      "display_name": "Dog",
+      "role": "nonverbal_dog",
+      "age_group": "animal",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "nonverbal",
+      "default_outfit": "none",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "cat",
+      "display_name": "Cat",
+      "role": "nonverbal_cat",
+      "age_group": "animal",
+      "personality": [
+        "clear",
+        "expressive",
+        "story-supporting"
+      ],
+      "voice_role": "nonverbal",
+      "default_outfit": "none",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    },
+    {
+      "id": "wizard",
+      "display_name": "Wizard",
+      "role": "fantasy_wizard",
+      "age_group": "adult",
+      "personality": [
+        "mysterious",
+        "expressive",
+        "comic"
+      ],
+      "voice_role": "dialogue",
+      "default_outfit": "wizard_robes",
+      "expressions": [
+        "neutral",
+        "happy",
+        "smirk",
+        "angry",
+        "shocked",
+        "confused",
+        "laughing",
+        "suspicious",
+        "serious"
+      ],
+      "poses": [
+        "idle",
+        "pointing",
+        "hands_up",
+        "thinking",
+        "running",
+        "holding_food",
+        "walking",
+        "sitting"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "code": "magahi",
+  "display_name": "Magahi",
+  "script": "Devanagari",
+  "region_hint": "Bihar / Jharkhand",
+  "voice_locale_preferences": [
+    "magahi",
+    "hi_IN"
+  ],
+  "native_writing_rule": "Write directly in conversational Magahi, preferably Devanagari. Do not create Hindi first and mechanically translate it. Preserve natural Magahi sentence rhythm, address forms and local conversational flavor without forcing stereotypes.",
+  "humor_guidance": [
+    "family and village/town situations",
+    "local conversational banter",
+    "reaction comedy",
+    "everyday relatable misunderstandings"
+  ],
+  "address_examples": [
+    "चचा",
+    "माय",
+    "बाबूजी",
+    "भइया"
+  ]
+}

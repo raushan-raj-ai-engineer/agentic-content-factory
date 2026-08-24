@@ -1,0 +1,66 @@
+{
+  "version": "11.2",
+  "goal": "Performance-driven limited animation plus topic-agnostic dynamic scene environments and coherent location continuity.",
+  "rig_root": "assets/cartoon_v11/rigs",
+  "foreground_root": "assets/cartoon_v11/foregrounds",
+  "performance": {
+    "action_prelude_max_seconds": 2.8,
+    "action_prelude_fraction": 0.28,
+    "listener_reaction_seconds": 0.42,
+    "listener_reaction_max_per_scene": 2,
+    "line_split_min_seconds": 2.0,
+    "speaker_medium_zoom": 1.5,
+    "speaker_close_zoom": 1.92,
+    "reaction_zoom": 2.18,
+    "action_zoom": 1.16,
+    "establishing_zoom": 1.04,
+    "camera_drift_px": 7,
+    "camera_drift_vertical_px": 4
+  },
+  "motion_quality": {
+    "sample_fps": 4,
+    "minimum_median_difference_yavg": 4.5,
+    "minimum_mid80_mean_yavg": 6.0,
+    "reference_note": "Internal anti-slideshow gate. Old generated sample measured ~3.57 median; V11 proof ~6.26; supplied reference ~11.67. Not a market/YPP guarantee."
+  },
+  "transport": {
+    "runtime_body_format": "qtrle_alpha_mov",
+    "alpha_preserved": true,
+    "runtime_png_body_sequences": false
+  },
+  "quality_contract": {
+    "whole_scene_single_pose_forbidden": true,
+    "whole_scene_topic_action_loop_forbidden": true,
+    "directional_locomotion_required": true,
+    "foreground_depth_enabled": true,
+    "line_specific_body_acting": true,
+    "listener_reactions_enabled": true,
+    "real_closeups_required": true,
+    "world_default_prop_injection_forbidden": true,
+    "extra_llm_calls": 0,
+    "exclusive_body_states_required": true,
+    "foot_plant_locomotion_required": true,
+    "actor_local_prop_attachment_required": true,
+    "primary_actor_only_scene_translation": true,
+    "dialogue_closeups_independent_of_scene_action": true,
+    "anti_slideshow_motion_gate_required": true,
+    "performance_track_precomposition_required": true,
+    "topic_agnostic_scene_dynamics_required": true,
+    "coherent_location_arcs_required": true,
+    "dynamic_background_plate_required": true,
+    "random_background_swapping_forbidden": true
+  },
+  "environment": {
+    "dynamic_background_enabled": true,
+    "overscan_px": 220,
+    "ambient_drift_px": 52,
+    "action_track_px": 120,
+    "vertical_drift_px": 18,
+    "topic_agnostic": true,
+    "extra_llm_calls": 0,
+    "virtual_camera_zones": true,
+    "dynamic_static_fallback": true,
+    "dynamic_emergency_renderer": true,
+    "extra_image_generation_calls": 0
+  }
+}
