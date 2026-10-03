@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT="${1:-/Users/maa/agentic-content-factory}"
+PROJECT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 LOG_DIR="$PROJECT/logs"
 
 mkdir -p "$LOG_DIR"

@@ -1,0 +1,11 @@
+# Tested top-level packages on Linux / Python 3.12. Not a GPU environment lock.
+pydantic==2.13.5
+pydantic-settings==2.15.0
+PyYAML==6.0.3
+httpx==0.28.1
+Pillow==12.3.0
+numpy==2.5.3
+piper-tts==1.8.0
+yt-dlp==2026.8.19
+pytest==9.1.1
+pytest-asyncio==1.4.0

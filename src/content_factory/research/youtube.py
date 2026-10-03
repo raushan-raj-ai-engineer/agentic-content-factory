@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from yt_dlp import YoutubeDL
+import httpx
 
 from content_factory.models.content import ResearchEvidence
 from content_factory.research.base import ResearchService
@@ -52,7 +53,13 @@ class YouTubeResearchService(ResearchService):
         max_results: int = 20,
         timeout: float = 30.0,
         lookback_days: int = 7,
+        api_key: str | None = None,
+        client: httpx.AsyncClient | None = None,
     ) -> None:
+        if api_key is not None and not api_key.strip():
+            raise ValueError("YOUTUBE_API_KEY is required for API mode")
+        self._api_key = api_key
+        self._client = client
         self._max_results = max(
             1,
             int(
@@ -97,10 +104,44 @@ class YouTubeResearchService(ResearchService):
         if not query:
             return []
 
+        if self._api_key is not None:
+            return await self._search_api(query)
         return await asyncio.to_thread(
             self._search_sync,
             query,
         )
+
+    async def _search_api(self, query: str) -> list[ResearchEvidence]:
+        """Optional API compatibility; public yt-dlp remains the keyless default."""
+        owned = self._client is None
+        client = self._client or httpx.AsyncClient(timeout=self._timeout)
+        try:
+            result = await client.get("https://www.googleapis.com/youtube/v3/search", params={
+                "key": self._api_key, "part": "snippet", "type": "video", "q": query,
+                "maxResults": min(self._max_results, 50)})
+            result.raise_for_status()
+            ids = [x.get("id", {}).get("videoId") for x in result.json().get("items", [])]
+            ids = [x for x in ids if x]
+            if not ids:
+                return []
+            details = await client.get("https://www.googleapis.com/youtube/v3/videos", params={
+                "key": self._api_key, "part": "snippet,statistics", "id": ",".join(ids)})
+            details.raise_for_status()
+            evidence = []
+            for item in details.json().get("items", []):
+                snippet = item.get("snippet", {})
+                stats = item.get("statistics", {})
+                views = int(stats.get("viewCount", 0))
+                evidence.append(ResearchEvidence(
+                    title=snippet.get("title", ""), source="YouTube",
+                    url="https://www.youtube.com/watch?v=" + item["id"],
+                    published_at=snippet.get("publishedAt"), engagement_score=float(views),
+                    view_count=views, like_count=int(stats.get("likeCount", 0)),
+                    comment_count=int(stats.get("commentCount", 0)), channel=snippet.get("channelTitle")))
+            return evidence
+        finally:
+            if owned:
+                await client.aclose()
 
     def _search_sync(
         self,

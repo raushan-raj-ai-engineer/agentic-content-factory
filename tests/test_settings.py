@@ -43,3 +43,38 @@ def test_settings_loads_environment_variables(
     assert settings.llm_model == "qwen2.5:3b"
     assert settings.llm_base_url == "http://localhost:11434"
     assert settings.llm_timeout == 120.0
+
+
+def test_yaml_llm_defaults_are_overridden_by_environment(monkeypatch) -> None:
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini-key")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-model-from-env")
+
+    settings = Settings.from_yaml("configs/local.yaml")
+
+    assert settings.llm_provider == "gemini"
+    assert settings.gemini_api_key == "gemini-key"
+    assert settings.gemini_model == "gemini-model-from-env"
+
+
+def test_from_yaml_loads_project_dotenv_before_yaml_defaults(tmp_path, monkeypatch) -> None:
+    project = tmp_path / "project"
+    configs = project / "configs"
+    configs.mkdir(parents=True)
+    (configs / "local.yaml").write_text(
+        "llm:\n  provider: auto\n  gemini:\n    model: yaml-model\n",
+        encoding="utf-8",
+    )
+    (project / ".env").write_text(
+        "LLM_PROVIDER=gemini\nGEMINI_API_KEY=test-key\nGEMINI_MODEL=gemini-dotenv-model\n",
+        encoding="utf-8",
+    )
+    for name in ("LLM_PROVIDER", "GEMINI_API_KEY", "GEMINI_MODEL"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.chdir(project)
+
+    settings = Settings.from_yaml("configs/local.yaml")
+
+    assert settings.llm_provider == "gemini"
+    assert settings.gemini_api_key == "test-key"
+    assert settings.gemini_model == "gemini-dotenv-model"

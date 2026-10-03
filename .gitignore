@@ -1,46 +1,146 @@
-.venv/
-__pycache__/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+# Environment / secrets
 .env
-.DS_Store
-*.pyc
-# Generated media artifacts
-artifacts/
-# Local AI models
-models/
-# Local/generated files
-.DS_Store
-.venv/
-venv/
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+credentials/
+secrets/
+token.json
+credentials.json
+
+# Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Test / coverage / lint / type-check caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-artifacts/
-logs/
-data/runs/
-.repair-backups/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+pytest-report.xml
 .cache/
-tmp/
-temp/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Node / frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.next/
+out/
+
+# Generated project artifacts
+artifacts/
 outputs/
+output/
+renders/
+rendered/
+generated/
+temp/
+tmp/
 
-# Large local cartoon sprite assets
-assets/cartoon_v9_1/sprites/
+# Media / render intermediates
+*.wav
+*.mp3
+*.aac
+*.m4a
+*.mp4
+*.mov
+*.webm
+*.mkv
+*.srt
+*.vtt
 
-# Local visual environment
-.visual-venv/
+# Keep intentionally committed sample/media assets if needed by unignoring explicitly
+# !assets/example.mp4
 
-# Local video engine runtime/cache/models
-.local-video-engine/
+# Manim
+media/
+manim_media/
+partial_movie_files/
 
-# Downloaded voice model binaries
-models/piper/*.onnx
+# Logs
+logs/
+*.log
+*.jsonl
 
-# Large ML model binaries
-*.safetensors
-*.ckpt
+# Local models / checkpoints
+models/
+checkpoints/
+*.onnx
+*.pt
 *.pth
+*.ckpt
+*.safetensors
+*.gguf
+
+# Download/cache directories
+downloads/
+.cache/
+huggingface/
+diffusers-cache/
+
+# Local databases / indexes
+*.db
+*.sqlite
+*.sqlite3
+chroma/
+chroma_db/
+.vectorstore/
+vectorstore/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Local run / performance outputs
+performance_report.json
+workflow_result.json
+
+# Package manager / local tool caches
+.uv/
+uv-cache/
+
+# Do not ignore source, tests, docs, configs, or lock files by default.

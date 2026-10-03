@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from content_factory.agents.base import Agent
 from content_factory.llm.base import LLMProvider
 from content_factory.orchestration.state import WorkflowState
+from content_factory.modes import is_study_mode
 from content_factory.utils.unicode_tokens import unicode_tokens
 
 
@@ -64,9 +65,25 @@ class PackagingOptimizerAgent(Agent):
         script_summary = self._script_summary(
             state
         )
+        study_mode = is_study_mode(state)
+        packaging_mode_rules = (
+            """
+STUDY MODE
+- Package this as a clear evergreen tutorial, not a news update.
+- Prefer words such as beginner, explained, how it works, tutorial, guide, example, testing, or from basics when supported by the script.
+- Do not use latest/current/reports merely because trend discovery found recent coverage.
+"""
+            if study_mode
+            else """
+CURRENT MODE
+- Current/report framing may be used only when supported by the script/evidence.
+"""
+        )
 
         prompt = f"""
 Create THREE accurate YouTube title + thumbnail packages for A/B testing.
+
+{packaging_mode_rules}
 
 TOPIC
 {state.topic or "unknown"}
@@ -249,6 +266,8 @@ RULES
             + cls._evidence_context(
                 state
             )
+            + " "
+            + cls._script_summary(state)
         ).lower()
 
         corpus_tokens = set(
@@ -265,6 +284,8 @@ RULES
             "details", "current", "reports", "report", "really", "about",
             "does", "could", "would", "this", "that", "with", "from",
             "your", "into", "after", "before", "why", "how", "look",
+            "beginner", "beginners", "tutorial", "guide", "works", "working",
+            "basics", "practice", "example", "examples", "learn", "learning",
             # Portuguese
             "que", "sabemos", "sobre", "últimos", "ultimos", "detalhes",
             "atuais", "relatos", "hoje", "entenda", "saiba", "agora",
@@ -323,6 +344,19 @@ RULES
             )
             or "en"
         ).lower()
+
+        if is_study_mode(state):
+            # Avoid awkward constructions such as "How How X Works Works" when
+            # the topic itself is already a question/explainer title. Prefer a
+            # compact concept name for safe fallback packaging.
+            base = topic.split(":", 1)[0].strip()
+            concept = re.sub(r"\bexplained\b", "", base, flags=re.IGNORECASE).strip(" -—:") or base
+            verb = "Work" if concept.lower().endswith("s") else "Works"
+            return [
+                f"{base}: Beginner Guide",
+                f"How {concept} {verb}",
+                f"{base}: From Basics to Practice",
+            ]
 
         templates = {
             "en": (

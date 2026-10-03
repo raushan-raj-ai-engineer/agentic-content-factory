@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from content_factory.agents.base import Agent
 from content_factory.llm.base import LLMProvider
 from content_factory.models.content import YouTubeScript
+from content_factory.modes import is_study_mode
 from content_factory.orchestration.state import WorkflowState
 
 
@@ -55,6 +56,7 @@ class RetentionOptimizerAgent(Agent):
             "growth_plan",
             {},
         )
+        study_mode = is_study_mode(state)
 
         first_section = (
             script.sections[
@@ -94,7 +96,8 @@ STRICT RULES
 2. Preserve factual meaning and uncertainty. Add NO new fact, quote, date,
    number, person, event, source, genre/category, result or claim.
 3. Keep the same narration language.
-4. Hook should normally be 8-22 spoken words and directly address the topic.
+4. Hook should normally be 10-24 spoken words and directly address the topic.
+4a. In Study Mode the hook MUST be informative: state a concrete learner problem and the mechanism/payoff the lesson will explain. Prefer a declarative sentence. Never use a generic rhetorical opener such as "Have you ever wondered", "Did you know", "What if", "Imagine", or "Ever wondered".
 5. Introduction should normally be 35-75 spoken words.
 6. No greeting, channel intro, "In today's video", "Before we begin", or
    early like/subscribe CTA.
@@ -128,14 +131,12 @@ STRICT RULES
             introduction
         )
 
-        opening_ok = (
-            5
-            <= candidate_hook_words
-            <= 35
-            and 20
-            <= candidate_intro_words
-            <= 110
+        hook_ok = (
+            5 <= candidate_hook_words <= 35
+            and (not study_mode or self._informative_study_hook(hook))
         )
+        intro_ok = 20 <= candidate_intro_words <= 110
+        opening_ok = hook_ok and intro_ok
 
         original_opening_words = max(
             1,
@@ -188,36 +189,82 @@ STRICT RULES
                 ),
             }
 
-        else:
-            reasons = []
-
-            if not opening_ok:
-                reasons.append(
-                    "opening word limits failed"
-                )
-
-            if not size_ok:
-                reasons.append(
-                    f"opening size ratio={ratio:.2f}"
-                )
-
-            state.metadata[
-                "retention_review"
-            ] = {
-                "applied": False,
-                "scope": "opening_only",
-                "before": before,
-                "reason": "; ".join(
-                    reasons
-                ),
-            }
-
-            print(
-                "[RETENTION] Opening candidate rejected; "
-                + "; ".join(
-                    reasons
-                )
+        elif hook_ok:
+            # A strong informative hook is more important than accepting an
+            # over-expanded introduction. Apply only the hook and keep the
+            # already-approved introduction/body byte-for-byte.
+            state.script = YouTubeScript(
+                title=script.title,
+                hook=hook,
+                introduction=script.introduction,
+                sections=script.sections,
+                conclusion=script.conclusion,
+                call_to_action=script.call_to_action,
+                estimated_duration_minutes=script.estimated_duration_minutes,
             )
+            state.metadata["retention_review"] = {
+                "applied": True,
+                "scope": "hook_only",
+                "before": before,
+                "after": self._metrics(state.script),
+                "reason": "optimized intro rejected; informative hook retained",
+            }
+            print("[RETENTION] Applied informative hook only; kept approved introduction.")
+
+        else:
+            grounded_hook = (
+                self._source_grounded_hook(first_section)
+                if study_mode and not self._informative_study_hook(script.hook)
+                else ""
+            )
+            if grounded_hook and self._informative_study_hook(grounded_hook):
+                state.script = YouTubeScript(
+                    title=script.title,
+                    hook=grounded_hook,
+                    introduction=script.introduction,
+                    sections=script.sections,
+                    conclusion=script.conclusion,
+                    call_to_action=script.call_to_action,
+                    estimated_duration_minutes=script.estimated_duration_minutes,
+                )
+                state.metadata["retention_review"] = {
+                    "applied": True,
+                    "scope": "source_grounded_hook",
+                    "before": before,
+                    "after": self._metrics(state.script),
+                    "reason": "generic hook replaced with an exact informative sentence from section 1",
+                }
+                print("[RETENTION] Replaced generic hook with source-grounded informative hook.")
+            else:
+                reasons = []
+
+                if not opening_ok:
+                    reasons.append(
+                        "opening word limits failed"
+                    )
+
+                if not size_ok:
+                    reasons.append(
+                        f"opening size ratio={ratio:.2f}"
+                    )
+
+                state.metadata[
+                    "retention_review"
+                ] = {
+                    "applied": False,
+                    "scope": "opening_only",
+                    "before": before,
+                    "reason": "; ".join(
+                        reasons
+                    ),
+                }
+
+                print(
+                    "[RETENTION] Opening candidate rejected; "
+                    + "; ".join(
+                        reasons
+                    )
+                )
 
         final = self._metrics(
             state.script
@@ -288,6 +335,47 @@ STRICT RULES
             "total_words": total,
             "generic_intro": generic_intro,
         }
+
+    @staticmethod
+    def _informative_study_hook(text: str) -> bool:
+        value = re.sub(r"\s+", " ", text).strip().lower()
+        if not value:
+            return False
+        generic_starts = (
+            "have you ever wondered", "did you know", "what if", "imagine ",
+            "ever wondered", "have you wondered", "do you know",
+        )
+        if value.startswith(generic_starts):
+            return False
+        # A hook should communicate an actual relationship/problem, not just
+        # announce that a topic exists. Verbs below are intentionally broad so
+        # this works for tech, math, science and general study subjects.
+        mechanism_terms = (
+            "because", "without", "instead", "connect", "turn", "changes",
+            "causes", "solves", "lets", "allows", "fails", "works",
+            "moves", "converts", "explains", "predicts", "controls",
+            "cannot", "can’t", "needs", "requires", "replaces", "bottleneck",
+            "lack", "lacks", "problem", "challenge", "prevents", "reduces",
+        )
+        return any(term in value for term in mechanism_terms) and len(value.split()) >= 8
+
+    @classmethod
+    def _source_grounded_hook(cls, first_section: str) -> str:
+        """Return an informative sentence already present in approved body text.
+
+        This guarantees a factual fallback without inventing a new claim when an
+        LLM returns a generic rhetorical hook or the optimized opening is rejected.
+        """
+        clean = re.sub(r"\s+", " ", first_section).strip()
+        if not clean:
+            return ""
+        sentences = re.split(r"(?<=[.!?])\s+", clean)
+        for sentence in sentences[:4]:
+            candidate = sentence.strip()
+            words = cls._count(candidate)
+            if 8 <= words <= 30 and cls._informative_study_hook(candidate):
+                return candidate
+        return ""
 
     @staticmethod
     def _clean(

@@ -48,6 +48,8 @@ class EngineConfig:
     @classmethod
     def from_project(cls, project_root: Path) -> "EngineConfig":
         project_root = project_root.resolve()
+        from dotenv import load_dotenv
+        load_dotenv(project_root / ".env", override=False)
         engine_root = Path(_env("CONTENT_FACTORY_VIDEO_ENGINE_HOME", str(project_root / ".local-video-engine"))).expanduser()
         models_root = Path(_env("CONTENT_FACTORY_VIDEO_MODELS", str(engine_root / "models"))).expanduser()
         cache_root = Path(_env("CONTENT_FACTORY_VIDEO_CACHE", str(engine_root / "cache"))).expanduser()
@@ -78,7 +80,7 @@ class EngineConfig:
             animatediff_frames=int(_env("ANIMATEDIFF_FRAMES", "8")),
             animatediff_steps=int(_env("ANIMATEDIFF_STEPS", "4")),
             animatediff_strength=float(_env("ANIMATEDIFF_STRENGTH", "0.42")),
-            piper_voice_dir=Path(_env("PIPER_VOICE_DIR", str(models_root / "piper"))).expanduser(),
+            piper_voice_dir=Path(_env("PIPER_VOICE_DIR", str(project_root / "models" / "piper"))).expanduser(),
             piper_voice_map={
                 "babuji": _env("PIPER_VOICE_BABUJI", "hi_IN-rohan-medium"),
                 "guddu": _env("PIPER_VOICE_GUDDU", "hi_IN-pratham-medium"),

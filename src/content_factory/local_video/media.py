@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import json
+import math
+import tempfile
 import re
 import shutil
 import subprocess
@@ -17,7 +19,10 @@ def require_binary(name: str) -> str:
 
 def run(cmd: list[str], *, cwd: Path | None = None, env: dict | None = None) -> None:
     print("[RUN]", " ".join(str(x) for x in cmd))
-    subprocess.run(cmd, cwd=str(cwd) if cwd else None, env=env, check=True)
+    if Path(str(cmd[0])).name == 'ffmpeg':
+        cmd = [cmd[0], '-nostdin', '-v', 'error', *cmd[1:]]
+    subprocess.run(cmd, cwd=str(cwd) if cwd else None, env=env, check=True,
+                   stdin=subprocess.DEVNULL, timeout=3600)
 
 
 def duration_seconds(path: Path) -> float:
@@ -25,24 +30,60 @@ def duration_seconds(path: Path) -> float:
     raw = subprocess.check_output([
         "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(path)
     ], text=True)
-    return float(json.loads(raw)["format"]["duration"])
+    value = float(json.loads(raw)["format"]["duration"])
+    if not math.isfinite(value) or value <= 0:
+        raise ValueError(f"Invalid media duration: {path}")
+    return value
 
 
-def concat_media(clips: list[Path], out: Path) -> None:
+def concat_media(clips: list[Path], out: Path, *, reencode: bool = False) -> None:
     require_binary("ffmpeg")
+    if not clips:
+        raise ValueError("No clips to concatenate")
+    expected = sum(duration_seconds(p) for p in clips)
     out.parent.mkdir(parents=True, exist_ok=True)
-    concat = out.with_suffix(".concat.txt")
-    concat.write_text("\n".join(f"file '{p.resolve().as_posix()}'" for p in clips), encoding="utf-8")
-    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat), "-c", "copy", str(out)])
+    with tempfile.TemporaryDirectory(prefix="concat-", dir=out.parent) as directory:
+        work = Path(directory)
+        # Numeric local links avoid apostrophe/newline quoting failures in ffconcat.
+        names = []
+        for index, source in enumerate(clips):
+            link = work / f"clip_{index:05d}.mp4"
+            try:
+                link.symlink_to(source.resolve())
+            except OSError:
+                shutil.copyfile(source, link)
+            names.append(f"file '{link.name}'")
+        listing = work / "clips.txt"
+        listing.write_text("\n".join(names), encoding="utf-8")
+        temporary = work / "joined.mp4"
+        video_args = (["-vf", "fps=24", "-c:v", "libx264", "-preset", "fast", "-crf", "20", "-threads", "2"]
+                      if reencode else ["-c:v", "copy"])
+        run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing),
+             *video_args, "-c:a", "aac", "-af", "aresample=async=1:first_pts=0",
+             "-movflags", "+faststart", str(temporary)])
+        if abs(duration_seconds(temporary) - expected) > max(0.5, len(clips)*0.08):
+            raise RuntimeError("Concatenation duration mismatch; output not promoted")
+        temporary.replace(out)
 
 
 def mux(video: Path, audio: Path, out: Path) -> None:
+    """Preserve the complete narration; repeat motion when it is shorter.
+
+    This is explicit motion reuse, not new generated motion or lip sync.
+    """
     require_binary("ffmpeg")
+    seconds = duration_seconds(audio)
+    duration_seconds(video)  # reject invalid motion before rendering
     out.parent.mkdir(parents=True, exist_ok=True)
-    run([
-        "ffmpeg", "-y", "-i", str(video), "-i", str(audio),
-        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", str(out)
-    ])
+    with tempfile.TemporaryDirectory(prefix="mux-", dir=out.parent) as directory:
+        temporary = Path(directory) / "clip.mp4"
+        run(["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(video), "-i", str(audio),
+             "-map", "0:v:0", "-map", "1:a:0", "-t", str(seconds),
+             "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+             "-movflags", "+faststart", str(temporary)])
+        if abs(duration_seconds(temporary) - seconds) > 0.25:
+            raise RuntimeError("Mux duration mismatch; output not promoted")
+        temporary.replace(out)
 
 
 @dataclass(frozen=True)

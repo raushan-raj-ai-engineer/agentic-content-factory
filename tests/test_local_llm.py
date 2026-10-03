@@ -3,6 +3,7 @@ import pytest
 from content_factory.llm.local import LocalLLMProvider
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
 async def test_local_llm_provider() -> None:
     provider = LocalLLMProvider(

@@ -2,11 +2,13 @@ from __future__ import annotations
 from content_factory.monetization.readiness import prepare_plan_for_monetization as _cf_prepare_plan
 
 import math
+import os
 import re
 from collections import Counter
 from typing import Any
 
 from content_factory.agents.base import Agent
+from content_factory.modes import is_study_mode
 from content_factory.llm.base import LLMProvider
 from content_factory.models.content import (
     ContentProductionPlan,
@@ -152,6 +154,23 @@ class ContentProductionAgent(Agent):
             ),
         )
 
+        # Study mode is pedagogical, not automatically technical. Preserve the
+        # real subject domain so science, finance, history, health, education,
+        # etc. do not inherit software boxes and agent/tool iconography. Only a
+        # genuinely ambiguous/general topic may receive a technical tie-breaker
+        # when the identity context itself clearly contains software markers.
+        if is_study_mode(state) and classification.domain == "general":
+            identity_lower = identity_context.lower()
+            if any(marker in identity_lower for marker in (
+                "software", "api", "python", "javascript", "ai ", "llm", "agent",
+                "rag", "database", "devops", "automation", "playwright", "selenium",
+            )):
+                classification = classify_domain(
+                    f"{identity_context} technical software engineering architecture programming",
+                    "technical_diagram",
+                )
+                print("[STUDY DOMAIN] general -> technical (identity-grounded tie-breaker)")
+
         domain = classification.domain
         family = classification.family
 
@@ -222,6 +241,26 @@ class ContentProductionAgent(Agent):
                 ),
             )
 
+        # Beginner study videos need shorter semantic windows than generic
+        # long-form content. A 25-30 second diagram is perceived as "the same
+        # scene playing again" even when small objects animate inside it. Keep
+        # study narration chunks closer to 14-20 seconds so the visual can
+        # establish one idea and hand off cleanly to the next teaching phase.
+        beginner_first = (
+            is_study_mode(state)
+            and os.getenv("STUDY_BEGINNER_FIRST", "true").strip().lower()
+            not in {"0", "false", "no", "off"}
+        )
+        if beginner_first:
+            try:
+                min_scene_words = int(os.getenv("STUDY_SCENE_MIN_WORDS", "34"))
+                max_scene_words = int(os.getenv("STUDY_SCENE_MAX_WORDS", "48"))
+            except ValueError:
+                min_scene_words, max_scene_words = 34, 48
+            min_scene_words = max(24, min(48, min_scene_words))
+            max_scene_words = max(min_scene_words, min(60, max_scene_words))
+            target_words = max(min_scene_words, min(max_scene_words, target_words))
+
         blocks = self._script_blocks(
             script,
             language_code=str(
@@ -255,6 +294,13 @@ class ContentProductionAgent(Agent):
                 text,
                 target_words=target_words,
             )
+            if beginner_first:
+                chunks = self._ensure_study_pedagogy_chunks(
+                    chunks,
+                    original_text=text,
+                    block_kind=block_kind,
+                    target_words=target_words,
+                )
 
             for chunk_index, chunk in enumerate(
                 chunks,
@@ -272,6 +318,13 @@ class ContentProductionAgent(Agent):
                         estimated_duration_seconds=duration,
                     )
                 )
+
+                learning_phase = self._study_learning_phase(
+                    block_kind=block_kind,
+                    chunk_index=chunk_index,
+                    chunk_count=len(chunks),
+                    text=chunk,
+                ) if beginner_first else "auto"
 
                 visual_type = self._visual_type(
                     domain=domain,
@@ -333,6 +386,10 @@ class ContentProductionAgent(Agent):
                             visual_type=visual_type,
                         ),
                         voice_segment_id=scene_id,
+                        learning_phase=learning_phase,
+                        chapter_title=section_name,
+                        chapter_scene_index=chunk_index,
+                        chapter_scene_count=len(chunks),
                     )
                 )
 
@@ -398,7 +455,7 @@ class ContentProductionAgent(Agent):
         state.metadata[
             "production_planner"
         ] = {
-            "mode": "deterministic_semantic_v3",
+            "mode": "deterministic_semantic_v4_beginner_first",
             "domain": domain,
             "scene_count": len(
                 visual_scenes
@@ -406,6 +463,7 @@ class ContentProductionAgent(Agent):
             "target_words_per_scene": target_words,
             "target_visual_interval_seconds": interval,
             "estimated_wpm": wpm,
+            "learning_phases": [scene.learning_phase for scene in visual_scenes],
         }
         state.status = "production_planned"
 
@@ -415,6 +473,19 @@ class ContentProductionAgent(Agent):
             f"scenes={len(visual_scenes)}, "
             f"target≈{target_words} words/scene"
         )
+        if beginner_first:
+            paired = 0
+            by_chapter: dict[str, list[VisualScene]] = {}
+            for scene in visual_scenes:
+                if scene.chapter_title:
+                    by_chapter.setdefault(scene.chapter_title, []).append(scene)
+            for chapter_scenes in by_chapter.values():
+                if len(chapter_scenes) >= 2 and chapter_scenes[0].learning_phase == "explain" and chapter_scenes[1].learning_phase == "flow":
+                    paired += 1
+            print(
+                "[STUDY PEDAGOGY] beginner-first explain->flow chapters="
+                f"{paired}/{sum(1 for v in by_chapter.values() if len(v) >= 2)}"
+            )
 
         return state
 
@@ -446,6 +517,13 @@ class ContentProductionAgent(Agent):
             full_context,
             "",
         )
+
+        # Topic/title identity outranks analogy vocabulary in educational
+        # scripts. A technical lesson may legitimately mention a restaurant,
+        # kitchen, chef, sports team, etc. as a mental model; those body words
+        # must not reclassify MCP/RAG/API/DSA into lifestyle domains.
+        if identity.family == "technical" and identity.score >= 7.0:
+            return identity
 
         if (
             has_factual_evidence
@@ -600,6 +678,99 @@ class ContentProductionAgent(Agent):
             )
 
         return blocks
+
+    @classmethod
+    def _ensure_study_pedagogy_chunks(
+        cls,
+        chunks: list[str],
+        *,
+        original_text: str,
+        block_kind: str,
+        target_words: int,
+    ) -> list[str]:
+        """Guarantee a beginner-friendly explain -> flow handoff.
+
+        A single 25-30 second study scene forces the renderer to keep one
+        composition alive for too long. For substantive sections, create at
+        least two narration windows when the prose is long enough: the first
+        establishes meaning, the second shows the mechanism/flow. The text is
+        never rewritten here; we only split at an existing sentence boundary.
+        """
+        if block_kind not in {"section", "introduction"}:
+            return chunks
+        if len(chunks) >= 2 or cls._word_count(original_text) < max(34, target_words):
+            return chunks
+
+        sentences = [
+            item.strip()
+            for item in re.split(r"(?<=[.!?।])\s+", re.sub(r"\s+", " ", original_text).strip())
+            if item.strip()
+        ]
+        if len(sentences) < 2:
+            return chunks
+
+        total = sum(cls._word_count(x) for x in sentences)
+        target = max(1, total // 2)
+        left: list[str] = []
+        left_words = 0
+        split_at = 1
+        for index, sentence in enumerate(sentences[:-1], start=1):
+            left.append(sentence)
+            left_words += cls._word_count(sentence)
+            split_at = index
+            if left_words >= target:
+                break
+        first = " ".join(left).strip()
+        second = " ".join(sentences[split_at:]).strip()
+        if cls._word_count(first) < 14 or cls._word_count(second) < 14:
+            return chunks
+        return [first, second]
+
+    @staticmethod
+    def _study_learning_phase(
+        *,
+        block_kind: str,
+        chunk_index: int,
+        chunk_count: int,
+        text: str,
+    ) -> str:
+        """Assign a pedagogical job to every narration window.
+
+        The first two substantive windows are intentionally stable across all
+        subjects: EXPLAIN first, FLOW second. Later windows may demonstrate,
+        implement or verify the concept. This gives the animation director a
+        reliable contract instead of inferring pedagogy from broad keywords.
+        """
+        if block_kind == "hook":
+            return "hook"
+        if block_kind == "cta":
+            return "cta"
+        if block_kind == "conclusion":
+            return "recap"
+        if chunk_index <= 1:
+            return "explain"
+        if chunk_index == 2:
+            return "flow"
+
+        lower = str(text or "").lower()
+        if any(token in lower for token in (
+            "for example", "example", "suppose", "imagine", "scenario",
+            "worked example",
+        )):
+            return "example"
+        if any(token in lower for token in (
+            "python", "javascript", "code", "function", "implementation",
+            "command", "api call",
+        )):
+            return "implementation"
+        if any(token in lower for token in (
+            "verify", "verification", "test", "testing", "check", "assert",
+            "failure", "edge case", "permission", "validate",
+        )):
+            return "verify"
+        if chunk_index == chunk_count:
+            return "recap"
+        return "example" if chunk_index == 3 else "implementation"
 
     @classmethod
     def _split_text(
@@ -1790,7 +1961,10 @@ class ContentProductionAgent(Agent):
             "technical_workflow",
         }:
             return (
-                "Large readable technical subject centered, with only the components needed to explain this narration."
+                "Subject-matter-expert teaching composition: one technical idea per frame; "
+                "show the mechanism or state transition visually, use short labels instead of paragraphs, "
+                "and include a visible input→process→verification relationship when the narration supports it. "
+                "Code must be large enough to read on a phone and should show only the lines needed for this beat."
             )
 
         return (
@@ -1859,7 +2033,9 @@ class ContentProductionAgent(Agent):
 
         if domain == "technical":
             return (
-                "clean professional technical visualization, 1080p, readable engineering structure"
+                "clean professional subject-matter-expert technical visualization, 1080p, "
+                "readable engineering structure, strong hierarchy, progressive explanation, "
+                "minimal text, no decorative dashboard clutter"
             )
 
         if domain == "cartoon":
@@ -2077,6 +2253,19 @@ class ContentProductionAgent(Agent):
             if state.strategy is not None
             else ""
         ).lower()
+        classification = state.metadata.get("domain_classification", {})
+        domain = str(classification.get("domain", "") or "").lower()
+        family = str(classification.get("family", "") or "").lower()
+
+        # Dense educational material needs time for the viewer to inspect code,
+        # diagrams and state changes. Keep scene planning aligned with the
+        # technical voice profile instead of squeezing 170 WPM of content into
+        # visuals that are narrated around 150 WPM.
+        if domain in {"technical", "education"} or family == "technical":
+            # Keep scene chunking aligned with measured study narration pace.
+            # Voice generation enforces ~138-152 WPM by delivery style; 144 is
+            # the neutral planning target for readable code/diagram lessons.
+            return 144
 
         if any(
             marker in audience

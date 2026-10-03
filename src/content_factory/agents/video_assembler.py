@@ -1,4 +1,8 @@
+import json
 from pathlib import Path
+
+from content_factory.modes import is_study_mode
+from content_factory.video.lesson import write_lesson
 
 from content_factory.agents.base import Agent
 from content_factory.models.content import (
@@ -17,9 +21,12 @@ class VideoAssemblyAgent(Agent):
         self,
         video_assembler: VideoAssembler,
         output_root: str = "artifacts",
+        *,
+        output_dir: str | None = None,
     ) -> None:
         self._video_assembler = video_assembler
         self._output_root = Path(output_root)
+        self._explicit_output_dir = Path(output_dir) if output_dir is not None else None
 
     @property
     def name(self) -> str:
@@ -48,6 +55,17 @@ class VideoAssemblyAgent(Agent):
             key=lambda item: item.scene_id,
         )
 
+        if not voice_artifacts or len(voice_artifacts) != len(visual_artifacts):
+            raise ValueError("Voice and visual counts must match and be non-empty")
+        voice_ids = [a.segment_id for a in voice_artifacts]
+        visual_ids = [a.scene_id for a in visual_artifacts]
+        if len(set(voice_ids)) != len(voice_ids):
+            raise ValueError("Duplicate voice segment IDs")
+        if len(set(visual_ids)) != len(visual_ids):
+            raise ValueError("Duplicate visual scene IDs")
+        if voice_ids != visual_ids:
+            raise ValueError("Voice and visual IDs must match")
+
         voice_files = [
             item.file_path
             for item in voice_artifacts
@@ -57,11 +75,12 @@ class VideoAssemblyAgent(Agent):
             for item in visual_artifacts
         ]
 
-        output_dir = artifact_subdir(
+        output_dir = self._explicit_output_dir or artifact_subdir(
             state,
             "video",
             self._output_root,
         )
+        output_dir.mkdir(parents=True, exist_ok=True)
         output_path = (
             output_dir / "final_video.mp4"
         )
@@ -82,6 +101,16 @@ class VideoAssemblyAgent(Agent):
                 status="assembled",
             )
         )
+        if is_study_mode(state) and state.production_plan is not None:
+            board_path = Path(str(state.metadata.get("study_storyboard_file") or ""))
+            boards = json.loads(board_path.read_text()).get("scenes", []) if board_path.is_file() else []
+            lesson_path = output_dir / "lesson.html"
+            write_lesson(
+                lesson_path, voice_files,
+                sorted(state.production_plan.visual_scenes, key=lambda scene: scene.id),
+                boards, state.production_plan.title,
+            )
+            state.metadata["interactive_lesson_file"] = str(lesson_path)
         state.status = "video_assembled"
 
         print(f"[ARTIFACT] Video: {output_path}")

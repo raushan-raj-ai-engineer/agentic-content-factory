@@ -32,31 +32,35 @@ from content_factory.visual.domain_registry import (
     prefers_public_media,
 )
 from content_factory.visual.technical import TechnicalVisualRenderer
+from content_factory.visual.study_backdrop import StudyBackdropRenderer
 
 
 class LocalVisualProvider(VisualProvider):
     """
-    PREMIUM VISUAL ENGINE V4
+    PREMIUM VISUAL ENGINE V6
 
     Factual:
       real reusable media where relevant + cinematic compositing
       otherwise domain-specific 1080p editorial visuals
 
-    Creative:
-      Apple-native MLX Z-Image-Turbo
-      1280x720 / 9 steps / persistent worker
-      no silent SD-Turbo fallback
+    Study:
+      deterministic cinematic vector backdrops + semantic Manim exact text
+      optional one-scene textless MLX hero (off by default)
 
-    The goal is to remove the "cheap AI slideshow" look.
+    Creative/non-study:
+      Apple-native MLX Z-Image-Turbo where appropriate
+
+    The goal is to remove garbled AI text and the "cheap AI slideshow" look.
     """
 
     MIN_SHARPNESS = 24.0
-    CACHE_VERSION = 12
+    CACHE_VERSION = 14
 
     def __init__(
         self,
     ) -> None:
         self._technical_renderer = TechnicalVisualRenderer()
+        self._study_backdrop = StudyBackdropRenderer()
         self._editorial_renderer = ViewerGraphicRenderer()
         self._public_media = WikimediaCommonsProvider()
         self._compositor = PremiumSceneCompositor()
@@ -76,9 +80,10 @@ class LocalVisualProvider(VisualProvider):
 
         self._context_topic = ""
         self._context_domain = "general"
+        self._study_mode = False
 
         print(
-            "[VISUAL] Premium Visual Engine V4 enabled."
+            "[VISUAL] Premium Visual Engine V6 enabled."
         )
 
     def set_context(
@@ -86,6 +91,7 @@ class LocalVisualProvider(VisualProvider):
         *,
         topic: str = "",
         domain: str | None = None,
+        study_mode: bool = False,
     ) -> None:
         self._context_topic = (
             topic
@@ -101,12 +107,25 @@ class LocalVisualProvider(VisualProvider):
             detected
             or "general"
         )
+        self._study_mode = bool(study_mode)
 
         print(
             f"[VISUAL] Run context: "
             f"domain={self._context_domain}, "
             f"topic={self._context_topic!r}"
         )
+        if self._study_mode:
+            ai_hero = os.getenv("CONTENT_FACTORY_STUDY_AI_HERO", "0").strip().lower()
+            ai_hero_on = ai_hero in {"1", "true", "yes", "on"}
+            print(
+                "[STUDY VISUAL POLICY] exact-text deterministic backdrops + semantic Manim; "
+                f"AI hero={'OPT-IN' if ai_hero_on else 'OFF'}; diffusion never renders teaching text."
+            )
+            if os.getenv("CONTENT_FACTORY_STUDY_HERO_VISUALS") is not None:
+                print(
+                    "[STUDY VISUAL POLICY] CONTENT_FACTORY_STUDY_HERO_VISUALS is deprecated "
+                    "and ignored; use CONTENT_FACTORY_STUDY_AI_HERO only for optional scene-1 ambience."
+                )
 
     async def generate(
         self,
@@ -288,9 +307,61 @@ class LocalVisualProvider(VisualProvider):
                 return
 
         # -------------------------------------------------------------
-        # Technical deterministic visuals.
+        # Study technical visuals: deterministic by default.
+        # Generative image models are not allowed to render instructional text.
+        # Optional AI hero art is restricted to scene 1 and is textless.
         # -------------------------------------------------------------
         if decision.route == "technical":
+            if self._study_mode:
+                used_ai_hero = False
+                if self._should_use_ai_study_hero(scene_index=scene_index):
+                    try:
+                        await self._generate_textless_study_hero(
+                            title=title,
+                            output_path=output_path,
+                            scene_index=scene_index,
+                        )
+                        used_ai_hero = True
+                        print(
+                            f"[STUDY VISUAL] scene={scene_index} backend=local-ai-hero "
+                            "text_policy=FORBIDDEN"
+                        )
+                    except Exception as exc:
+                        print(
+                            "[STUDY VISUAL] AI hero unavailable; deterministic backdrop selected: "
+                            f"{exc}"
+                        )
+                if not used_ai_hero:
+                    self._study_backdrop.render(
+                        title=title,
+                        description=description,
+                        visual_type=vtype,
+                        output_path=output_path,
+                        topic=self._context_topic or title,
+                        scene_index=scene_index,
+                    )
+                    print(
+                        f"[STUDY VISUAL] scene={scene_index} backend=deterministic-vector "
+                        "text_policy=MANIM_ONLY"
+                    )
+                if used_ai_hero:
+                    prepare_for_video(output_path)
+                self._report(
+                    output_path,
+                    "study_deterministic" if not used_ai_hero else "study_ai_hero",
+                    True,
+                    sharpness=sharpness_score(output_path),
+                    extra={
+                        "domain": decision.domain,
+                        "semantic_clear": True,
+                        "study_mode": True,
+                        "instructional_text_generated_by_ai": False,
+                    },
+                )
+                self._write_motion(output_path, mode="editorial_static")
+                self._store_cache(cache_key, output_path)
+                return
+
             self._technical_renderer.render(
                 title=title,
                 description=description,
@@ -299,6 +370,7 @@ class LocalVisualProvider(VisualProvider):
                     prompt,
                 ),
                 output_path=output_path,
+                topic=self._context_topic or title,
             )
             prepare_for_video(
                 output_path
@@ -380,6 +452,46 @@ class LocalVisualProvider(VisualProvider):
             cache_key,
             output_path,
         )
+
+
+    def _should_use_ai_study_hero(self, *, scene_index: int) -> bool:
+        """AI art is opt-in and limited to one textless opener per video."""
+        enabled = os.getenv("CONTENT_FACTORY_STUDY_AI_HERO", "0").strip().lower()
+        return (
+            enabled in {"1", "true", "yes", "on"}
+            and scene_index == 1
+            and self._premium.available
+        )
+
+    async def _generate_textless_study_hero(
+        self,
+        *,
+        title: str,
+        output_path: str,
+        scene_index: int,
+    ) -> None:
+        """Optional textless hero background. Never receives narration or labels."""
+        topic = re.sub(r"[^A-Za-z0-9 +#&./_-]+", " ", self._context_topic or title)
+        topic = re.sub(r"\s+", " ", topic).strip()[:90]
+        premium_prompt = (
+            "Cinematic abstract technology background for an educational video. "
+            f"Concept: {topic}. "
+            "Wide 16:9 composition, dark charcoal/navy environment, electric cyan and violet light, "
+            "abstract connected systems, flowing data particles, geometric technology forms, depth and negative space. "
+            "ABSOLUTELY NO TEXT, NO WORDS, NO LETTERS, NO NUMBERS, NO CAPTIONS, NO LABELS, "
+            "NO CODE GLYPHS, NO SIGNAGE, NO LOGOS, NO WATERMARKS, NO UI PANELS WITH WRITING. "
+            "Do not draw monitors or documents containing writing. Visual atmosphere only."
+        )
+        seed = self._stable_seed(title, topic, scene_index)
+        await self._premium.generate(
+            prompt=premium_prompt,
+            output_path=output_path,
+            seed=seed,
+            width=1280,
+            height=720,
+            steps=6,
+        )
+        prepare_for_video(output_path)
 
     async def _generate_premium_product(
         self,
@@ -584,7 +696,7 @@ class LocalVisualProvider(VisualProvider):
             raise RuntimeError(
                 "Creative video selected but the premium Apple-Silicon visual "
                 "backend is not installed. Run:\n"
-                "bash /Users/maa/agentic-content-factory/"
+                "bash "
                 "scripts/setup_premium_visual_model.sh\n"
                 "V4 intentionally does not fall back to the old low-quality "
                 "SD-Turbo path."

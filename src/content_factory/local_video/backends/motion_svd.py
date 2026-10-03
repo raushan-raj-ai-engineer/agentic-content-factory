@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-import os, subprocess
+import os, subprocess, json
 from ..config import EngineConfig
 from ..hardware import detect_hardware
 
@@ -11,8 +11,13 @@ class SVDMotionBackend:
         hw=detect_hardware()
         if not self.cfg.svd_python.exists():
             raise RuntimeError(f"SVD Python venv missing: {self.cfg.svd_python}. Run: bash scripts/bootstrap_local_video_engine.sh --motion")
-        if hw.platform=='Darwin' and hw.machine=='arm64' and not hw.mps_available:
-            raise RuntimeError('Apple Silicon detected but PyTorch MPS is unavailable')
+        if hw.platform=='Darwin' and hw.machine=='arm64':
+            # Torch belongs to the isolated motion environment, not the main app.
+            probe = subprocess.check_output([str(self.cfg.svd_python), '-c',
+                'import torch,json; print(json.dumps({"mps":torch.backends.mps.is_available()}))'],
+                text=True, timeout=60)
+            if not json.loads(probe.strip().splitlines()[-1])["mps"]:
+                raise RuntimeError('PyTorch MPS is unavailable in the SVD environment')
         if hw.total_memory_gb is not None and hw.total_memory_gb < 7.0 and not self.force:
             raise RuntimeError('SVD proof requires about an 8GB-class Apple Silicon machine')
     def generate(self,image:Path,prompt:str,out:Path,*,seconds:float,fps:int,width:int,height:int,seed:int)->Path:
@@ -30,9 +35,9 @@ class SVDMotionBackend:
             '--seed',str(seed),'--model',self.cfg.svd_model,
             '--cache',str((self.cfg.cache_root/'huggingface').resolve()),
         ]
-        env=os.environ.copy(); env.setdefault('PYTORCH_ENABLE_MPS_FALLBACK','1'); env.setdefault('PYTORCH_MPS_HIGH_WATERMARK_RATIO','0.0')
+        env=os.environ.copy(); env.setdefault('PYTORCH_ENABLE_MPS_FALLBACK','1'); env.setdefault('PYTORCH_MPS_HIGH_WATERMARK_RATIO','1.0')
         print('[MOTION SVD V19.6]',' '.join(cmd[:8]),'...')
-        subprocess.run(cmd,check=True,env=env)
+        subprocess.run(cmd,check=True,env=env,stdin=subprocess.DEVNULL,timeout=7200)
         if not out.exists() or out.stat().st_size<1024:
             raise RuntimeError('SVD worker returned without a usable mp4')
         return out

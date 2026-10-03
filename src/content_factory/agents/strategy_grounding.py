@@ -5,6 +5,7 @@ from collections import Counter
 
 from content_factory.agents.base import Agent
 from content_factory.orchestration.state import WorkflowState
+from content_factory.modes import is_study_mode
 from content_factory.research.trend_signals import get_signal
 
 
@@ -90,9 +91,7 @@ class StrategyGroundingAgent(Agent):
             state
         )
 
-        duration_limit = self._duration_limit(
-            evidence_count
-        )
+        study_mode = is_study_mode(state)
 
         original_duration = max(
             1,
@@ -101,48 +100,94 @@ class StrategyGroundingAgent(Agent):
             ),
         )
 
-        target_duration = min(
-            original_duration,
-            duration_limit,
-        )
-
         corrected = False
 
-        if len(unsupported) >= 2:
-            corrected = True
-
-            keyword_phrase = ", ".join(
-                keywords[:3]
+        if study_mode:
+            # Evergreen study videos are grounded in the topic identity and
+            # stable technical knowledge, not in the amount of news coverage.
+            # News can help discovery, but it must not rewrite the lesson into
+            # a current-affairs explainer.
+            # Study-video duration is adaptive. Keep the strategist estimate as
+            # soft planning guidance; the final duration is reconciled from the
+            # actual narration/audio later in the pipeline.
+            requested_duration = int(
+                state.metadata.get("requested_duration_minutes") or 0
             )
-
-            if keyword_phrase:
-                state.strategy.angle = (
-                    f"What current public reports actually say about {topic}, "
-                    f"with focus on {keyword_phrase}"
+            if requested_duration > 0:
+                target_duration = requested_duration
+                state.strategy.estimated_duration_minutes = requested_duration
+                duration_source = "user"
+                print(
+                    f"[DURATION POLICY] source=user target={target_duration}m "
+                    "(overrides strategist for this run)"
                 )
             else:
+                target_duration = original_duration
+                duration_source = "strategy"
+                print(
+                    f"[DURATION POLICY] source=strategy target={target_duration}m "
+                    "(adaptive within a narrow completion band)"
+                )
+            if len(unsupported) >= 2:
+                corrected = True
                 state.strategy.angle = (
-                    f"What current public reports actually confirm about {topic}"
+                    f"Teach {topic} from first principles for a beginner, then "
+                    "connect the mental model to a practical example, "
+                    "implementation, verification, and common failure cases."
+                )
+                state.strategy.hook = (
+                    f"What problem does {topic} solve, and how does it actually "
+                    "work? Build the mental model first, then apply it."
+                )
+                print(
+                    "[GROUNDING] Study-mode drift corrected without converting "
+                    "the lesson into news coverage."
+                )
+        else:
+            duration_source = "evidence"
+            duration_limit = self._duration_limit(
+                evidence_count
+            )
+            target_duration = min(
+                original_duration,
+                duration_limit,
+            )
+
+            if len(unsupported) >= 2:
+                corrected = True
+
+                keyword_phrase = ", ".join(
+                    keywords[:3]
                 )
 
-            state.strategy.hook = (
-                f"{topic} is trending. Here is what the current evidence "
-                "actually confirms — without adding speculation."
-            )
+                if keyword_phrase:
+                    state.strategy.angle = (
+                        f"What current public reports actually say about {topic}, "
+                        f"with focus on {keyword_phrase}"
+                    )
+                else:
+                    state.strategy.angle = (
+                        f"What current public reports actually confirm about {topic}"
+                    )
 
-            print(
-                "[GROUNDING] Strategy drift corrected. "
-                f"Unsupported terms: {', '.join(unsupported[:8])}"
-            )
+                state.strategy.hook = (
+                    f"{topic} is trending. Here is what the current evidence "
+                    "actually confirms — without adding speculation."
+                )
 
-        if target_duration < original_duration:
-            state.strategy.estimated_duration_minutes = (
-                target_duration
-            )
-            print(
-                f"[GROUNDING] Evidence-based duration: "
-                f"{original_duration}m -> {target_duration}m"
-            )
+                print(
+                    "[GROUNDING] Strategy drift corrected. "
+                    f"Unsupported terms: {', '.join(unsupported[:8])}"
+                )
+
+            if target_duration < original_duration:
+                state.strategy.estimated_duration_minutes = (
+                    target_duration
+                )
+                print(
+                    f"[GROUNDING] Evidence-based duration: "
+                    f"{original_duration}m -> {target_duration}m"
+                )
 
         state.metadata["topic_grounding"] = {
             "topic": topic,
@@ -151,6 +196,8 @@ class StrategyGroundingAgent(Agent):
             "evidence_count": evidence_count,
             "top_keywords": keywords[:12],
             "target_duration_minutes": target_duration,
+            "duration_source": duration_source,
+            "content_mode": "study" if study_mode else "current",
         }
 
         state.status = "strategy_grounded"

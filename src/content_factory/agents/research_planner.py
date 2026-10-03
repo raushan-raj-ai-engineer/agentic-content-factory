@@ -105,6 +105,93 @@ SPECIAL_CASE = {
 }
 
 
+# Categories used for study/technical channels are hard domain constraints,
+# not weak ranking hints. A sports/weather trend must never win a
+# ``--category technical`` run just because it has more search volume.
+STRICT_EDUCATIONAL_CATEGORIES = {"technical", "ai", "software_testing"}
+
+CATEGORY_TERMS = {
+    "technical": {
+        "ai", "artificial intelligence", "llm", "language model", "openai",
+        "chatgpt", "anthropic", "claude", "gemini", "ollama", "rag", "retrieval",
+        "embedding", "vector database", "agent", "agentic", "mcp",
+        "model context protocol", "python", "javascript", "typescript",
+        "java", "golang", "rust", "programming", "developer", "software",
+        "api", "database", "sql", "cloud", "aws", "azure", "kubernetes",
+        "docker", "github", "git", "linux", "security", "cybersecurity",
+        "playwright", "selenium", "pytest", "testing", "automation",
+        "framework", "devops", "ci/cd", "cicd", "machine learning",
+        "deep learning", "computer science", "algorithm", "data structure",
+        "frontend", "backend", "web development", "mobile development",
+        "compiler", "runtime", "chip", "gpu", "nvidia", "developer tool",
+    },
+    "ai": {
+        "ai", "artificial intelligence", "llm", "language model", "openai",
+        "chatgpt", "anthropic", "claude", "gemini", "ollama", "rag", "retrieval",
+        "embedding", "vector database", "agent", "agentic", "mcp",
+        "model context protocol", "machine learning", "deep learning",
+        "neural network", "transformer", "prompt", "inference",
+        "fine tuning", "fine-tuning", "multimodal", "reasoning model",
+        "hallucination", "ai safety", "ai evaluation", "model evaluation",
+    },
+    "software_testing": {
+        "testing", "software testing", "qa", "quality assurance", "sdet",
+        "test automation", "automation testing", "playwright", "selenium",
+        "pytest", "cypress", "webdriver", "appium", "api testing",
+        "contract testing", "performance testing", "load testing",
+        "unit testing", "integration testing", "end to end", "e2e",
+        "test framework", "test strategy", "test coverage", "mocking",
+        "ci/cd", "cicd", "quality engineering", "ai testing",
+        "llm testing", "rag testing", "evaluation framework",
+        "llm evaluation", "rag quality", "quality evaluation",
+    },
+}
+
+# Obvious off-domain subjects for a technical study channel. These are
+# evaluated against the candidate topic itself, never against noisy related
+# headlines. A title such as "AI regulation explained" can still pass because
+# it contains a direct technical signal, while "Supreme Court" cannot be
+# rescued by a related headline that happens to mention a database or AI.
+NON_TECH_TOPIC_TERMS = {
+    "weather", "forecast", "rain", "temperature", "hurricane", "cyclone",
+    "vs", "match", "score", "cricket", "football", "soccer", "baseball",
+    "basketball", "tennis", "olympia", "nba", "nfl", "ipl", "fifa",
+    "supreme court", "election", "president", "minister", "parliament",
+    "senate", "congress", "politics", "political", "plea", "court case",
+    "celebrity", "actor", "actress", "movie", "box office", "reality show",
+}
+
+CATEGORY_FALLBACK_TOPICS = {
+    "technical": [
+        "AI Agents for Beginners",
+        "RAG Explained for Beginners",
+        "Python Automation Testing",
+        "Playwright TypeScript Tutorial",
+        "Model Context Protocol MCP",
+        "API Testing with Pytest",
+        "LLM Evaluation for Developers",
+    ],
+    "ai": [
+        "RAG Explained for Beginners",
+        "AI Agents Explained",
+        "Model Context Protocol MCP",
+        "LLM Evaluation and Testing",
+        "Prompt Injection Defense",
+        "Local LLMs with Ollama",
+        "Embeddings and Vector Databases",
+    ],
+    "software_testing": [
+        "Playwright TypeScript Testing",
+        "API Testing with Pytest",
+        "Selenium Python Automation",
+        "Contract Testing with OpenAPI",
+        "CI CD Test Automation",
+        "AI Testing for RAG Applications",
+        "Playwright Fixtures TypeScript",
+    ],
+}
+
+
 @dataclass
 class _TrendSeed:
     title: str
@@ -155,6 +242,10 @@ class ResearchPlannerAgent(Agent):
 
         if not auto_mode:
             clear_signals()
+            # Preserve the user's exact requested scope even if a later strategy
+            # shortens the display title. Downstream study/script agents use this
+            # to avoid silently dropping explicit facets after a colon/em dash.
+            state.metadata["requested_topic"] = raw_topic
             state.research_plan = ResearchPlan(topics=[raw_topic])
             state.status = "research_planned"
             print(f"[RESEARCH] Explicit topic: {raw_topic}")
@@ -366,6 +457,24 @@ class ResearchPlannerAgent(Agent):
         candidates = self._merge_cross_market_candidates(
             candidates
         )
+
+        category = (self._configured_category or "auto").strip().lower()
+        if category in STRICT_EDUCATIONAL_CATEGORIES:
+            before_category = len(candidates)
+            candidates = [
+                candidate
+                for candidate in candidates
+                if self._candidate_matches_category(candidate, category)
+            ]
+            print(
+                f"[CATEGORY] Strict {category} gate: "
+                f"kept={len(candidates)}/{before_category}"
+            )
+            candidates = self._add_category_fallbacks(
+                candidates,
+                category,
+                minimum=7,
+            )
 
         if len(candidates) < 4:
             fallback_topics = await self._topics_from_real_headlines(
@@ -904,6 +1013,119 @@ class ResearchPlannerAgent(Agent):
         )
 
         return merged
+
+    @classmethod
+    def _text_matches_category(
+        cls,
+        text: str,
+        category: str,
+    ) -> bool:
+        terms = CATEGORY_TERMS.get(category, set())
+        if not terms:
+            return True
+
+        normalized = " " + re.sub(r"[^a-z0-9+#./-]+", " ", text.casefold()) + " "
+        tokens = set(normalized.split())
+
+        for term in terms:
+            needle = term.casefold().strip()
+            if not needle:
+                continue
+            if " " in needle or any(ch in needle for ch in "/.-+"):
+                if f" {needle} " in normalized or needle in normalized:
+                    return True
+            elif needle in tokens:
+                return True
+        return False
+
+    @classmethod
+    def _candidate_matches_category(
+        cls,
+        candidate: DiscoverySignal,
+        category: str,
+    ) -> bool:
+        # IMPORTANT: strict educational categories must be qualified by the
+        # candidate title itself. Related headlines are discovery context and
+        # can contain incidental words such as "AI", "database" or "software"
+        # that would otherwise leak sports/politics/weather into a tech run.
+        direct_text = " ".join(
+            part
+            for part in (candidate.topic, candidate.raw_topic or "")
+            if part
+        )
+
+        if not cls._text_matches_category(direct_text, category):
+            return False
+
+        if category in STRICT_EDUCATIONAL_CATEGORIES:
+            normalized = " " + re.sub(
+                r"[^a-z0-9+#./-]+", " ", direct_text.casefold()
+            ) + " "
+            for blocked in NON_TECH_TOPIC_TERMS:
+                blocked_normalized = blocked.casefold().strip()
+                if f" {blocked_normalized} " in normalized:
+                    # Permit a clearly technical title that intentionally
+                    # discusses a non-tech domain (e.g. "AI election security")
+                    # only when the topic contains at least two category terms.
+                    matches = 0
+                    for term in CATEGORY_TERMS.get(category, set()):
+                        needle = term.casefold().strip()
+                        if not needle:
+                            continue
+                        if " " in needle or any(ch in needle for ch in "/.-+"):
+                            hit = needle in normalized
+                        else:
+                            hit = needle in set(normalized.split())
+                        matches += int(hit)
+                    if matches < 2:
+                        return False
+
+        return True
+
+    @classmethod
+    def _add_category_fallbacks(
+        cls,
+        candidates: list[DiscoverySignal],
+        category: str,
+        *,
+        minimum: int,
+    ) -> list[DiscoverySignal]:
+        if len(candidates) >= minimum:
+            return candidates
+
+        seen = {candidate.topic.casefold() for candidate in candidates}
+        added = 0
+        for rank, topic in enumerate(CATEGORY_FALLBACK_TOPICS.get(category, []), start=1):
+            if topic.casefold() in seen:
+                continue
+            language = detect_language(topic, geo="US")
+            candidates.append(
+                DiscoverySignal(
+                    topic=topic,
+                    raw_topic=topic,
+                    score=round(56.0 - rank * 0.35, 2),
+                    clarity_score=100.0,
+                    sources=["Category-safe curriculum fallback"],
+                    language_code=language["code"],
+                    language_name=language["name"],
+                    market_geo=language["market_geo"],
+                    market_name=language["market_name"],
+                    language_priority=float(language["priority_weight"]),
+                    language_priority_rank=int(language["priority_rank"]),
+                    youtube_market_reach_m=float(language["youtube_ad_reach_m"]),
+                )
+            )
+            seen.add(topic.casefold())
+            added += 1
+            if len(candidates) >= minimum:
+                break
+
+        if added:
+            print(
+                f"[CATEGORY] Added {added} category-safe fallback topic(s) "
+                "for YouTube validation."
+            )
+        return candidates
 
     @staticmethod
     def _select_language_diverse(

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT="${1:-/Users/maa/agentic-content-factory}"
+PROJECT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 cd "$PROJECT"
 source .venv/bin/activate
 export PYTHONPATH="$PROJECT/src${PYTHONPATH:+:$PYTHONPATH}"

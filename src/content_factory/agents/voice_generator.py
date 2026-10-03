@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +14,8 @@ from content_factory.models.content import (
 from content_factory.orchestration.state import WorkflowState
 from content_factory.utils.artifact_paths import artifact_subdir
 from content_factory.voice.base import VoiceProvider
+from content_factory.voice.timing import create_timing
+from content_factory.modes import is_study_mode
 from content_factory.research.language_market import target_locale
 
 
@@ -110,6 +114,10 @@ class VoiceGenerationAgent(Agent):
             ] = resolved_locale
 
         voice_audience = audience
+        if str(state.metadata.get("content_mode") or "").lower() == "study":
+            # Make Study Mode authoritative for pacing across *all* subjects,
+            # including math/science topics that may not contain tech keywords.
+            voice_audience = "Study mode educational lesson. " + voice_audience
 
         if target_language_name:
             voice_audience = (
@@ -120,7 +128,7 @@ class VoiceGenerationAgent(Agent):
                     if resolved_locale
                     else ""
                 )
-                + audience
+                + voice_audience
             )
 
             print(
@@ -187,6 +195,15 @@ class VoiceGenerationAgent(Agent):
                     }
                 )
 
+            if is_study_mode(state):
+                timing = await asyncio.to_thread(
+                    create_timing, output_path, segment.text, resolved_locale,
+                )
+                manifest[-1]["timing_source"] = timing["source"]
+                manifest[-1]["duration_exact_seconds"] = timing["duration_seconds"]
+                if timing.get("warning"):
+                    print(f"[TIMING] {timing['warning']}")
+
             artifacts.append(
                 VoiceArtifact(
                     segment_id=segment.id,
@@ -205,6 +222,27 @@ class VoiceGenerationAgent(Agent):
             ),
             encoding="utf-8",
         )
+
+        total_words = sum(
+            max(1, len(re.findall(r"\b[\w@./+-]+\b", str(item.get("text") or ""), flags=re.UNICODE)))
+            for item in manifest
+        )
+        total_seconds = sum(float(item.get("duration_seconds") or 0) for item in manifest)
+        total_silence = sum(float(item.get("silence_seconds") or 0) for item in manifest)
+        if total_seconds > 0:
+            overall_wpm = total_words / total_seconds * 60.0
+            active_seconds = max(0.1, total_seconds - total_silence)
+            active_wpm = total_words / active_seconds * 60.0
+            silence_ratio = total_silence / total_seconds
+            state.metadata["voice_effective_wpm"] = round(overall_wpm, 1)
+            state.metadata["voice_active_wpm"] = round(active_wpm, 1)
+            state.metadata["voice_silence_ratio"] = round(silence_ratio, 4)
+            print(
+                "[VOICE PACE SUMMARY] "
+                f"words={total_words} duration={total_seconds:.1f}s "
+                f"overall≈{overall_wpm:.1f}wpm active≈{active_wpm:.1f}wpm "
+                f"silence={silence_ratio*100:.1f}%"
+            )
 
         state.voice_generation = VoiceGenerationResult(
             artifacts=artifacts,

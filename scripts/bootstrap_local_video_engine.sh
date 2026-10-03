@@ -39,7 +39,8 @@ choose_py310() {
   fi
   echo "python3"
 }
-PY310="$(choose_py310)"
+PY310="python3"
+if [[ "$DO_MOTION" == 1 || "$DO_LIPSYNC" == 1 ]]; then PY310="$(choose_py310)"; fi
 
 if command -v brew >/dev/null 2>&1; then
   command -v ffmpeg >/dev/null 2>&1 || brew install ffmpeg
@@ -47,14 +48,8 @@ if command -v brew >/dev/null 2>&1; then
 fi
 
 if [[ "$DO_VOICE" == 1 ]]; then
-  echo "[BOOTSTRAP] Piper local Hindi TTS"
-  python3 -m venv "$VENV_HOME/piper"
-  "$VENV_HOME/piper/bin/python" -m pip install -U pip
-  "$VENV_HOME/piper/bin/python" -m pip install "piper-tts==1.6.0"
-  # expose piper in engine bin and project wrapper will prepend via explicit symlink if possible
-  mkdir -p "$ENGINE_HOME/bin"
-  ln -sf "$VENV_HOME/piper/bin/piper" "$ENGINE_HOME/bin/piper"
-  echo "[BOOTSTRAP] Piper installed. Add to PATH for shell use: export PATH=\"$ENGINE_HOME/bin:\$PATH\""
+  echo "[BOOTSTRAP] Installing core and voice dependencies in the project environment"
+  bash "$ROOT/setup.sh"
 fi
 
 if [[ "$DO_MOTION" == 1 ]]; then

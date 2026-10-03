@@ -251,7 +251,14 @@
         "eligibility",
         "application form",
         "education portal",
-        "semester"
+        "semester",
+        "mathematics",
+        "algebra",
+        "geometry",
+        "calculus",
+        "trigonometry",
+        "probability",
+        "statistics"
       ],
       "negative": [
         "student discount earbuds",
@@ -348,7 +355,24 @@
         "docker",
         "kubernetes",
         "server",
-        "software testing"
+        "software testing",
+        "model context protocol",
+        "mcp",
+        "retrieval augmented generation",
+        "rag",
+        "large language model",
+        "llm",
+        "ai agent",
+        "ai agents",
+        "pytest",
+        "fastapi",
+        "json-rpc",
+        "json rpc",
+        "algorithm",
+        "data structure",
+        "typescript",
+        "automation testing",
+        "software engineering"
       ],
       "medium": [
         "code",
@@ -562,7 +586,15 @@
         "chemistry",
         "biology",
         "चंद्रयान",
-        "इसरो"
+        "इसरो",
+        "photosynthesis",
+        "cell biology",
+        "genetics",
+        "ecology",
+        "molecule",
+        "atom",
+        "energy transfer",
+        "chemical reaction"
       ],
       "medium": [
         "science",
@@ -570,7 +602,16 @@
         "study finds",
         "laboratory",
         "experiment",
-        "telescope"
+        "telescope",
+        "chlorophyll",
+        "oxygen",
+        "carbon dioxide",
+        "plant biology",
+        "organism",
+        "force",
+        "velocity",
+        "wave",
+        "frequency"
       ],
       "negative": [
         "science fiction movie"

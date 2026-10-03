@@ -39,7 +39,7 @@ def main() -> int:
 
     import os
     os.environ.setdefault('PYTORCH_ENABLE_MPS_FALLBACK','1')
-    os.environ.setdefault('PYTORCH_MPS_HIGH_WATERMARK_RATIO','0.0')
+    os.environ.setdefault('PYTORCH_MPS_HIGH_WATERMARK_RATIO','1.0')
 
     import torch
     from PIL import Image

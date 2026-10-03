@@ -211,3 +211,28 @@ async def test_video_assembly_rejects_id_mismatch(
         await agent.execute(state)
 
     assembler.assemble.assert_not_awaited()
+
+
+def test_storyboard_portable_manim_repair_stays_animated_and_removes_sensitive_kinds():
+    from content_factory.video.local import LocalVideoAssembler
+
+    spec = {
+        "objects": [
+            {"id": "code", "kind": "code", "label": "Tool implementation", "slot": "wide_mid", "detail": ["result = tool()"]},
+            {"id": "term", "kind": "terminal", "label": "result", "slot": "right_bottom", "detail": []},
+            {"id": "server", "kind": "server", "label": "MCP Server", "slot": "left_mid", "detail": []},
+        ],
+        "beats": [
+            {"cue": "show", "action": "type_code", "target": "code", "weight": 1},
+            {"cue": "step", "action": "step_code", "target": "code", "weight": 1},
+            {"cue": "connect", "action": "connect", "target": "server", "source": "server", "destination": "code", "weight": 1},
+            {"cue": "result", "action": "reveal", "target": "term", "weight": 1},
+        ],
+    }
+
+    repaired = LocalVideoAssembler._repair_storyboard_spec_for_manim(spec)
+    assert repaired["render_repair"] == "portable-semantic-v3"
+    assert [o["kind"] for o in repaired["objects"]] == ["node", "node", "server"]
+    assert repaired["beats"][0]["action"] == "reveal"
+    assert repaired["beats"][1]["action"] == "highlight"
+    assert repaired["beats"][2]["action"] == "connect"

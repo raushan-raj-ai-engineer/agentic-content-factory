@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-PROJECT="/Users/maa/agentic-content-factory"
+PROJECT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODEL="${OLLAMA_MODEL:-llama3.2}"
 
 cd "$PROJECT" || exit 1
@@ -9,9 +9,7 @@ source .venv/bin/activate
 
 mkdir -p logs artifacts
 
-OLD_LOG_COUNT="$(find logs -maxdepth 1 -type f 2>/dev/null | wc -l | tr -d ' ')"
-find logs -maxdepth 1 -type f -delete 2>/dev/null || true
-echo "[LOG] Cleared ${OLD_LOG_COUNT:-0} old log file(s)."
+# Keep previous logs for troubleshooting.
 
 STAMP="$(date +%Y%m%d-%H%M%S)"
 FULL_LOG="$PROJECT/logs/content-factory-$STAMP.log"

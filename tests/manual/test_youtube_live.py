@@ -4,6 +4,7 @@ from content_factory.config.settings import Settings
 from content_factory.research.youtube import YouTubeResearchService
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
 async def test_live_youtube_search() -> None:
     """Manual live test against YouTube Data API."""

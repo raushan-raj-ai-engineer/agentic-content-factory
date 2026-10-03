@@ -11,6 +11,7 @@ import httpx
 
 from content_factory.agents.base import Agent
 from content_factory.orchestration.state import WorkflowState
+from content_factory.modes import is_study_mode
 
 
 class EvidenceEnrichmentAgent(Agent):
@@ -34,6 +35,21 @@ class EvidenceEnrichmentAgent(Agent):
                 else ""
             )
         ).strip()
+
+        if is_study_mode(state):
+            state.metadata["enriched_evidence"] = []
+            state.metadata["evidence_summary"] = {
+                "topic": topic,
+                "count": 0,
+                "sources": [],
+                "mode": "study",
+            }
+            state.status = "evidence_enriched"
+            print(
+                "[EVIDENCE] Study mode: skipped fresh-news enrichment; "
+                "using stable technical/curriculum grounding."
+            )
+            return state
 
         if not topic:
             state.metadata["enriched_evidence"] = []

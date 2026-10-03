@@ -1,8 +1,43 @@
 llm:
-  provider: ollama
-  model: llama3.2
-  base_url: http://localhost:11434
-  timeout: 600
+  # auto | ollama | gemini | openai | anthropic | compatible
+  # Environment variables override these YAML defaults.
+  provider: auto
+  model: auto
+  timeout: 180
+  fallback_order:
+    - gemini
+    - openai
+    - anthropic
+    - compatible
+    - ollama
+  ollama_fallback: true
+
+  ollama:
+    model: auto
+    base_url: http://localhost:11434
+
+  # Cloud/provider model names are intentionally not hard-coded here because
+  # model catalogs change. Configure them through .env when you enable one.
+  gemini:
+    model: ""
+    api_key: ""
+    base_url: https://generativelanguage.googleapis.com/v1beta
+
+  openai:
+    model: ""
+    api_key: ""
+    base_url: https://api.openai.com/v1
+
+  anthropic:
+    model: ""
+    api_key: ""
+    base_url: https://api.anthropic.com/v1
+
+  # Any provider exposing an OpenAI-compatible /chat/completions endpoint.
+  compatible:
+    model: ""
+    api_key: ""
+    base_url: ""
 
 research:
   provider: youtube_local

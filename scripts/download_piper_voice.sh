@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT="${1:-/Users/maa/agentic-content-factory}"
+PROJECT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 VOICE_NAME="${2:-}"
 
 if [[ -z "$VOICE_NAME" ]]; then
   echo "Usage:"
-  echo "  bash scripts/download_piper_voice.sh /Users/maa/agentic-content-factory <VOICE_NAME>"
+  echo "  bash scripts/download_piper_voice.sh $(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd) <VOICE_NAME>"
   echo
   echo "List available voices:"
-  echo "  cd /Users/maa/agentic-content-factory"
+  echo "  cd $(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   echo "  source .venv/bin/activate"
   echo "  python -m piper.download_voices"
   exit 2

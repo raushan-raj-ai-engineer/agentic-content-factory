@@ -1,0 +1,9 @@
+{
+  "title": "Filter and sort automation tasks: a real browser demo",
+  "page": "demo.html",
+  "steps": [
+    {"title":"Inspect the task board","narration":"This local sample app contains four automation tasks. We will filter them by technology and then sort the visible results. The footage is an actual browser recording, not a generated screenshot.","actions":[]},
+    {"title":"Filter for Python","narration":"Type Python into the search field. Only the API checks and CSV validation tasks remain. The match count changes to two, so we can verify the visible result immediately.","actions":[{"type":"fill","selector":"#search","value":"Python"}]},
+    {"title":"Restore and sort","narration":"Clear the filter, then sort by name. All four tasks return in alphabetical order. A useful software demo shows both the user action and the observable outcome.","actions":[{"type":"fill","selector":"#search","value":""},{"type":"click","selector":"#sort"}]}
+  ]
+}

@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from content_factory.agents.base import Agent
 from content_factory.llm.base import LLMProvider
 from content_factory.orchestration.state import WorkflowState
+from content_factory.modes import is_study_mode
 
 
 class GrowthPlan(BaseModel):
@@ -52,6 +53,12 @@ class GrowthStrategyAgent(Agent):
             )
 
         evidence = self._evidence_summary(state)
+        study_mode = is_study_mode(state)
+        relevance_rule = (
+            "For study mode, why_now should explain the practical learning/career value of the concept; do not force a trending-news reason."
+            if study_mode
+            else "why_now must be grounded in the topic being currently relevant; do not invent a date/event."
+        )
 
         prompt = f"""
 Create a viewer-growth plan for this YouTube video.
@@ -80,8 +87,7 @@ Improve:
 RULES
 1. Do not invent facts.
 2. The core promise must be fully deliverable by the final script.
-3. "why_now" must be grounded in the topic being currently relevant; do not
-   invent a date/event.
+3. {relevance_rule}
 4. Hook blueprint should reach the viewer's reason for clicking immediately.
 5. Avoid channel greetings, logo intros, "welcome back", and long setup.
 6. Suggest 1-3 open loops only; too many feels manipulative.

@@ -147,23 +147,56 @@ class VoiceDirector:
             total_segments=total_segments,
         )
 
-        speed = {
-            "hook": 0.93,
-            "energetic": 0.94,
-            "curious": 0.98,
-            "serious": 1.04,
-            "warm": 1.02,
-            "neutral": 1.00,
-        }[style]
+        study_delivery = self._is_study_topic(topic=topic, audience=audience)
 
-        rate_wpm = {
-            "hook": 205,
-            "energetic": 200,
-            "curious": 185,
-            "serious": 172,
-            "warm": 176,
-            "neutral": 185,
-        }[style]
+        if study_delivery:
+            # Technical learners need time to inspect code/diagrams while the
+            # narration continues. Piper uses length_scale (>1 is slower);
+            # macOS uses rate_wpm directly. Hooks stay slightly more energetic
+            # but never jump to entertainment/news pacing.
+            # v0.5.2 study pacing: the previous Ryan profile rendered an
+            # approximately 1,120-word lesson in ~6m40s (~168 WPM overall),
+            # which is too quick for learners reading code and diagrams.
+            # Piper length_scale is only a first-pass prosody control; the local
+            # provider also measures the generated WAV and slows it to this WPM
+            # target when needed, preserving pitch with ffmpeg atempo.
+            speed = {
+                "hook": 1.10,
+                "energetic": 1.12,
+                "curious": 1.16,
+                "serious": 1.20,
+                "warm": 1.18,
+                "neutral": 1.18,
+            }[style]
+            # v0.5.5: target a calm but not sluggish US study cadence.
+            # The local provider normalizes generated audio bidirectionally and
+            # caps excessive pauses, so these are learner-facing targets rather
+            # than assumptions about any particular TTS model.
+            rate_wpm = {
+                "hook": 154,
+                "energetic": 150,
+                "curious": 147,
+                "serious": 140,
+                "warm": 144,
+                "neutral": 145,
+            }[style]
+        else:
+            speed = {
+                "hook": 0.93,
+                "energetic": 0.94,
+                "curious": 0.98,
+                "serious": 1.04,
+                "warm": 1.02,
+                "neutral": 1.00,
+            }[style]
+            rate_wpm = {
+                "hook": 205,
+                "energetic": 200,
+                "curious": 185,
+                "serious": 172,
+                "warm": 176,
+                "neutral": 185,
+            }[style]
 
         # Slight variation only. Large noise shifts sound synthetic.
         noise = {
@@ -376,6 +409,26 @@ class VoiceDirector:
             "big",
         ) % slots
 
+
+    @staticmethod
+    def _is_study_topic(*, topic: str, audience: str) -> bool:
+        context = f"{topic} {audience}".lower()
+        keywords = (
+            "tutorial", "learn", "study", "student", "interview", "course",
+            "python", "typescript", "javascript", "java", "coding", "code",
+            "algorithm", "data structure", "dsa", "software", "testing", "qa",
+            "automation", "playwright", "selenium", "api", "database", "sql",
+            "devops", "ci/cd", "architecture", "system design", "engineering",
+            "artificial intelligence", " ai ", "llm", "rag", "agent", "machine learning",
+            "deep learning", "prompt", "vector database", "cloud", "docker",
+            "kubernetes", "fastapi", "github", "technical", "technology", "tech",
+            "math", "mathematics", "algebra", "geometry", "calculus", "trigonometry",
+            "probability", "statistics", "physics", "chemistry", "biology", "science",
+            "astronomy", "economics", "history", "geography", "exam", "lesson",
+        )
+        padded = f" {context} "
+        return any(keyword in padded for keyword in keywords)
+
     @staticmethod
     def _style_for(
         text: str,
@@ -434,7 +487,7 @@ class VoiceDirector:
     def _normalize_locale(
         value: str,
     ) -> str:
-        normalized = value.strip().lower()
+        normalized = value.strip().lower().replace("-", "_")
 
         if normalized in LANGUAGE_ALIASES:
             return LANGUAGE_ALIASES[normalized]

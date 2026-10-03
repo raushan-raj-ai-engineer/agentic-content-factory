@@ -1,2 +1,4 @@
 [console_scripts]
 content-factory = content_factory.main:main
+content-factory-channel = content_factory.channel.__main__:main
+content-factory-local-video = content_factory.local_video.cli:main

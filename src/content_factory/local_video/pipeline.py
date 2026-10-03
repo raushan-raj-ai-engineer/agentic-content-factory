@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import subprocess
+from uuid import uuid4
 
 from .config import EngineConfig
 from .hardware import detect_hardware
@@ -40,6 +41,7 @@ class LocalVideoPipeline:
         self.lipsync_mode = lipsync_backend
         self.lipsync = MuseTalkBackend(cfg)
         self.hw = detect_hardware()
+        self.motion_repeats = []
 
     def _use_lipsync(self) -> bool:
         if self.lipsync_mode in ("off", "none"):
@@ -74,6 +76,11 @@ class LocalVideoPipeline:
             synced = work / "synced" / f"{tag}.mp4"
             video_for_mux = self.lipsync.sync(motion, voice, synced)
             used_sync = True
+        if duration_seconds(video_for_mux) + 0.1 < duration_seconds(voice):
+            if used_sync:
+                raise RuntimeError("Lip-synced motion is shorter than narration; refusing to loop lip sync")
+            self.motion_repeats.append(tag)
+            print(f"[TIMING] {tag}: short motion will repeat to preserve all narration")
         clip = work / "clips" / f"{tag}.mp4"
         mux(video_for_mux, voice, clip)
         return clip
@@ -86,7 +93,8 @@ class LocalVideoPipeline:
         shots = shots_from_plan(plan, image_dir, max_scenes=max_scenes, max_shots_per_scene=max_shots_per_scene)
         if not shots:
             raise RuntimeError("No shots generated from plan")
-        work = out.parent / (out.stem + "_work")
+        self.motion_repeats = []
+        work = out.parent / (out.stem + "_work_" + uuid4().hex[:10])
         work.mkdir(parents=True, exist_ok=True)
         clips = []
         for shot in shots:
@@ -94,7 +102,9 @@ class LocalVideoPipeline:
             clips.append(self.render_shot(shot, work, seed=seed))
         concat_media(clips, out)
         manifest = {
-            "version": "19.6.0",
+            "version": "0.2.0-repaired",
+            "motion_repeated_shots": self.motion_repeats,
+            "duration_seconds": duration_seconds(out),
             "plan": str(plan_path),
             "images": str(image_dir),
             "shots": len(shots),

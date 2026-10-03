@@ -48,7 +48,7 @@ class PremiumCreativeGenerator:
         if not self.available:
             raise RuntimeError(
                 "Premium local visual model is not installed. Run: "
-                "bash /Users/maa/agentic-content-factory/"
+                "bash "
                 "scripts/setup_premium_visual_model.sh"
             )
 

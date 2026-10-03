@@ -6,8 +6,22 @@ import re
 from content_factory.agents.base import Agent
 from content_factory.llm.base import LLMProvider
 from content_factory.models.content import FactCheckResult, YouTubeScript
+from content_factory.modes import is_study_mode
 from content_factory.orchestration.state import WorkflowState
 from content_factory.research.trend_signals import get_signal
+
+
+NO_ISSUE_STATUS_PATTERNS = (
+    re.compile(r"^no material false or unsupported current claims remain\.?$", re.I),
+    re.compile(r"^no material false or unsupported claims remain\.?$", re.I),
+    re.compile(r"^no material factual issues remain\.?$", re.I),
+    re.compile(r"^no material issues remain\.?$", re.I),
+    re.compile(r"^no unsupported current claims remain\.?$", re.I),
+    re.compile(r"^no unsupported claims remain\.?$", re.I),
+    re.compile(r"^no factual errors remain\.?$", re.I),
+    re.compile(r"^no factual issues remain\.?$", re.I),
+    re.compile(r"^no issues remain\.?$", re.I),
+)
 
 
 MONTH_PATTERN = (
@@ -36,6 +50,9 @@ class FactCheckerAgent(Agent):
         if state.script is None:
             raise ValueError("Script is required before fact checking.")
 
+        print(
+            f"[FACT] Mode={'study' if is_study_mode(state) else 'current'}"
+        )
         first = await self._check(state)
 
         if first.approved and not first.issues:
@@ -44,30 +61,12 @@ class FactCheckerAgent(Agent):
             print(f"[FACT] Passed with score={first.score}")
             return state
 
-        # V20.2: zero factual issues must never trigger an LLM rewrite.
-        if len(first.issues) == 0:
-            _cf_fact = getattr(state, 'fact_check', None)
-            if _cf_fact is None:
-                _cf_fact = (
-                    locals().get('first')
-                    or locals().get('result')
-                    or locals().get('fact_result')
-                    or locals().get('fact_check_result')
-                )
-                if _cf_fact is None:
-                    raise RuntimeError('Fact checker zero-issue result was not recoverable')
-            state.fact_check = _cf_fact
-            try:
-                _cf_fact.approved = True
-                _cf_fact.score = max(int(getattr(_cf_fact, 'score', 0) or 0), 95)
-                _cf_fact.issues = []
-            except Exception:
-                try:
-                    state.fact_check = _cf_fact.model_copy(update={'approved': True, 'score': 100, 'issues': []})
-                except Exception as _cf_exc:
-                    raise RuntimeError('Could not normalize zero-issue FactCheckResult') from _cf_exc
-            state.status = 'fact_checked'
-            print('[FACT] PASS: 0 material issue(s); repair=SKIPPED')
+        # An empty issue list does not reverse the checker's rejection.
+        if not first.issues:
+            state.fact_check = first
+            state.status = "fact_check_blocked"
+            state.stop_requested = True
+            print("[FACT] BLOCKED: checker rejected without actionable repair details")
             return state
         print(
             f"[FACT] Found {len(first.issues)} issue(s). "
@@ -108,9 +107,35 @@ class FactCheckerAgent(Agent):
         state: WorkflowState,
     ) -> FactCheckResult:
         deterministic_issues = self._deterministic_checks(state)
+        study_mode = is_study_mode(state)
+
+        if study_mode:
+            checking_policy = """
+STUDY-MODE FACT-CHECK POLICY
+- This is an evergreen technical tutorial, not a breaking-news report.
+- Validate stable technical definitions, architecture, algorithms, code behavior,
+  and best-practice explanations against the authoritative fact pack and your
+  established technical knowledge.
+- Do NOT reject a correct stable technical concept merely because it is absent
+  from Google News or a YouTube title.
+- Fresh/current claims (dates, launches, adoption counts, company announcements,
+  benchmark numbers, quotations, or claims that something happened recently)
+  still require explicit supplied evidence.
+- Prefer removing unnecessary current-event claims rather than turning the
+  tutorial into media-literacy commentary.
+- Material technical errors must still fail the check.
+"""
+        else:
+            checking_policy = """
+CURRENT-EVENT FACT-CHECK POLICY
+- Bound factual claims to the supplied evidence.
+- Unsupported current-event specifics are failures.
+"""
 
         prompt = f"""
-Fact-check this YouTube script strictly against the supplied evidence.
+Fact-check this YouTube script using the appropriate content policy.
+
+{checking_policy}
 
 TOPIC
 {state.topic or "unknown"}
@@ -140,56 +165,104 @@ DETERMINISTIC ISSUES ALREADY FOUND
 {json.dumps(deterministic_issues, ensure_ascii=False, indent=2)}
 
 RULES
-1. Do not use general world knowledge to rescue an unsupported script claim.
+1. In study mode, stable technical knowledge may be used to validate stable
+   technical claims; in current-event mode, do not use general knowledge to
+   rescue unsupported current claims.
 2. Exact dates, named sources, quotes, company responses, motives, release
-   changes, security claims, product changes, and causal impacts require
-   explicit support in supplied evidence.
+   changes, security incidents, adoption numbers, product changes, and causal
+   impacts require explicit support in supplied evidence.
 3. A YouTube upload date is not evidence that the underlying event happened
    on that date.
 4. YouTube titles are discovery evidence, not authoritative proof.
-5. Reported/alleged information must be phrased with uncertainty.
+5. Reported/alleged current information must be phrased with uncertainty.
 6. Speculation must be clearly labeled as analysis, not fact.
 7. Reviewer concerns are advisory, not automatically true. Resolve each
-   factual concern against the supplied evidence rather than ignoring it.
-8. If ANY material unsupported claim remains, approved=false.
+   concern against the relevant evidence/technical knowledge.
+8. If ANY material false or unsupported current claim remains, approved=false.
 9. Include every deterministic issue in issues.
 10. If there are no material issues, approved=true.
+11. IMPORTANT: when approved=true, issues MUST be an empty list []. Do not put success/status sentences such as "No material issues remain" inside issues.
 """
 
         result = await self._llm.generate_structured(
             prompt,
             FactCheckResult,
             system_prompt=(
-                "You are a strict evidence-grounded fact checker. "
-                "Unsupported specifics are failures."
+                "You are a senior technical fact checker. "
+                + (
+                    "For evergreen tutorials, distinguish stable technical knowledge "
+                    "from time-sensitive claims and do not demand news evidence for "
+                    "correct fundamentals."
+                    if study_mode
+                    else "Unsupported current-event specifics are failures."
+                )
             ),
         )
 
         combined: list[str] = []
         seen: set[str] = set()
 
-        for issue in [*deterministic_issues, *result.issues]:
+        raw_llm_issues = [str(issue).strip() for issue in result.issues if str(issue).strip()]
+        normalized_statuses: list[str] = []
+
+        for issue in [*deterministic_issues, *raw_llm_issues]:
             clean = str(issue).strip()
             key = clean.lower()
-            if clean and key not in seen:
-                seen.add(key)
-                combined.append(clean)
+            if not clean or key in seen:
+                continue
+            seen.add(key)
+
+            # Some models occasionally put a success/status sentence in the
+            # issues array. Treat only a narrow set of explicit no-issue
+            # statements as status text; never suppress actionable concerns.
+            if issue not in deterministic_issues and self._is_no_issue_status(clean):
+                normalized_statuses.append(clean)
+                continue
+
+            combined.append(clean)
 
         result.issues = combined
 
         if combined:
             result.approved = False
             result.score = min(int(result.score), 70)
+        elif raw_llm_issues and normalized_statuses and len(normalized_statuses) == len(raw_llm_issues):
+            # The payload is semantically a pass even if the model emitted an
+            # inconsistent approved=false flag alongside a no-issue sentence.
+            result.approved = True
+            print(
+                "[FACT] Normalized non-actionable no-issue status text; "
+                "no material fact-check issues remain."
+            )
 
         return result
+
+    @staticmethod
+    def _is_no_issue_status(text: str) -> bool:
+        normalized = " ".join(text.strip().split())
+        return any(pattern.fullmatch(normalized) for pattern in NO_ISSUE_STATUS_PATTERNS)
 
     async def _repair_script(
         self,
         state: WorkflowState,
         issues: list[str],
     ) -> YouTubeScript:
+        study_mode = is_study_mode(state)
+        repair_policy = (
+            "For this evergreen technical tutorial, preserve correct stable technical "
+            "teaching and REMOVE unnecessary news/report/date language. Rebuild any "
+            "affected section around definition, mental model, mechanism, example, "
+            "implementation, verification, and edge cases. Do not replace the lesson "
+            "with uncertainty/media-literacy filler."
+            if study_mode
+            else "Keep the script evidence-bounded and remove unsupported current claims."
+        )
+
         prompt = f"""
-Rewrite the script to remove ALL unsupported factual claims.
+Rewrite the script to remove ALL unsupported or incorrect factual claims.
+
+MODE-SPECIFIC REPAIR POLICY
+{repair_policy}
 
 TOPIC
 {state.topic or "unknown"}
@@ -221,19 +294,25 @@ REPAIR RULES
    responses, motives, causal impacts, and product/release claims.
 3. Do not replace one unsupported detail with another.
 4. If something is only reported/alleged, explicitly say that.
-5. Where evidence is insufficient, discuss uncertainty, implications,
-   media-literacy, what is confirmed vs unconfirmed, and how viewers can
-   evaluate claims without inventing facts.
+5. In study mode, when current evidence is insufficient, omit the current-event
+   claim and continue teaching stable technical fundamentals. In current-event
+   mode, discuss uncertainty and what is confirmed vs unconfirmed.
 6. Do not duplicate the conclusion in a numbered section.
-7. Return only the YouTubeScript JSON schema.
+7. Preserve beginner-friendly theory before implementation and include
+   verification plus concrete edge/failure examples when applicable.
+8. Return only the YouTubeScript JSON schema.
 """
 
         return await self._llm.generate_structured(
             prompt,
             YouTubeScript,
             system_prompt=(
-                "Repair factual grounding only. "
-                "Never invent replacement facts."
+                "Repair factual grounding without inventing replacement facts. "
+                + (
+                    "Keep evergreen technical teaching useful and concept-first."
+                    if study_mode
+                    else "Keep current-event claims evidence-bounded."
+                )
             ),
         )
 
@@ -337,6 +416,23 @@ REPAIR RULES
                     f"Unsupported causal/speculative claim: '{phrase}'."
                 )
 
+        # Study examples sometimes accidentally turn into live/current claims
+        # (for example: "Tokyo today: -22°C"). A precise number paired with
+        # today/current/right-now language is time-sensitive and must be sourced
+        # or rewritten as an explicitly hypothetical example.
+        current_numeric = re.compile(
+            r"[^.!?]{0,90}\b(?:today|right now|currently|current)\b[^.!?]{0,90}"
+            r"(?:[-+]?\d+(?:\.\d+)?\s*(?:°[cf]|%|usd|eur|gbp|inr|dollars?|euros?|pounds?))",
+            re.IGNORECASE,
+        )
+        for match in current_numeric.finditer(text):
+            claim = re.sub(r"\s+", " ", match.group(0)).strip()
+            if claim and claim.lower() not in evidence_lower:
+                issues.append(
+                    "Unsourced live/current numeric example must be removed or made explicitly hypothetical: "
+                    + claim[:160]
+                )
+
         return issues
 
     @staticmethod
@@ -346,17 +442,46 @@ REPAIR RULES
         if "playwright" in normalized and "mcp" in normalized:
             return """
 - MCP means Model Context Protocol.
-- MCP is an open standard.
+- MCP is an open protocol for connecting AI applications to external tools/data.
 - Playwright MCP is an MCP server providing browser automation with Playwright.
-- It uses structured accessibility snapshots.
-- Standard setup: npx @playwright/mcp@latest
-- Node.js 20+ and an MCP client are standard prerequisites.
+- It uses structured page/accessibility information for browser interaction.
+- A common setup command is: npx @playwright/mcp@latest
+- An MCP client is required.
 - TypeScript and GitHub Copilot are not universal prerequisites.
 - Planner/Generator/Healer are not established built-in Playwright MCP agents.
 """
+        if "model context protocol" in normalized or normalized.strip() == "mcp" or " mcp" in normalized:
+            return """
+- MCP means Model Context Protocol.
+- MCP standardizes how an AI application can connect to external context and capabilities.
+- The architecture is commonly described using hosts, clients, and servers.
+- MCP servers can expose tools, resources, and prompts to clients.
+- Tool calls let a model-driven application request an action exposed by a server.
+- Resources provide readable context/data; prompts provide reusable prompt templates.
+- MCP uses structured protocol messages; JSON-RPC 2.0 is part of the protocol design.
+- MCP does not make an AI system automatically safe or correct; permissions, validation, and testing still matter.
+"""
+        if "rag" in normalized or "retrieval augmented" in normalized:
+            return """
+- RAG means retrieval-augmented generation.
+- A RAG system retrieves relevant external information and supplies it as context for generation.
+- Embeddings are a common way to represent semantic similarity for retrieval.
+- Vector databases are common for embedding search but are not the only possible retrieval mechanism.
+- Retrieval quality and answer quality are separate concerns and should be evaluated separately.
+- RAG can reduce some unsupported answers but does not guarantee factual correctness.
+"""
+        if "ai agent" in normalized or "agents" in normalized:
+            return """
+- An AI agent is a system in which a model can select actions/tools as part of a task loop.
+- Tools expose capabilities such as search, APIs, databases, code execution, or business actions.
+- Memory is optional; not every agent requires persistent memory.
+- Agent testing should validate tool selection, arguments, sequencing, task completion, and safety boundaries.
+- Tool outputs and permissions require validation; an agent is not automatically reliable because it can call tools.
+"""
         return (
-            "No topic-specific authoritative fact pack is configured. "
-            "Claims must be bounded by the supplied current evidence."
+            "No topic-specific fact pack is configured. For evergreen study videos, "
+            "validate stable technical fundamentals using established technical knowledge; "
+            "time-sensitive claims still require supplied evidence."
         )
 
     @staticmethod

@@ -7,14 +7,26 @@ from content_factory.agents.base import Agent
 from content_factory.agents.script_writer_chunked import generate_chunked_script
 from content_factory.llm.base import LLMProvider
 from content_factory.models.content import YouTubeScript
+from pydantic import BaseModel, Field
+from content_factory.modes import is_study_mode
 from content_factory.orchestration.state import WorkflowState
 from content_factory.research.trend_signals import get_signal
+
+
+class _SectionAddition(BaseModel):
+    section_title: str
+    added_narration: str
+
+
+class _TargetedExpansion(BaseModel):
+    additions: list[_SectionAddition] = Field(default_factory=list)
 
 
 class ScriptWriterAgent(Agent):
     """Generate an evidence-bounded script with realistic narration length."""
 
-    WORDS_PER_MINUTE = 165
+    # Study/technical videos need room for viewers to inspect diagrams and code.
+    WORDS_PER_MINUTE = 150
     MIN_DURATION_RATIO = 0.95
     MAX_DURATION_RATIO = 1.05
 
@@ -36,6 +48,10 @@ class ScriptWriterAgent(Agent):
 
         strategy = state.strategy
 
+        print(
+            f"[SCRIPT] Mode={'study' if is_study_mode(state) else 'current'}"
+        )
+
         grounding = state.metadata.get(
             "topic_grounding",
             {},
@@ -52,18 +68,14 @@ class ScriptWriterAgent(Agent):
             ),
         )
 
-        target_words = (
-            target_minutes
-            * self.WORDS_PER_MINUTE
-        )
+        target_wpm = 144 if is_study_mode(state) else self.WORDS_PER_MINUTE
+        target_words = target_minutes * target_wpm
 
         min_words = round(
-            target_words
-            * 0.78
+            target_words * (0.90 if is_study_mode(state) else 0.78)
         )
         max_words = round(
-            target_words
-            * 1.05
+            target_words * (1.08 if is_study_mode(state) else 1.05)
         )
 
         script = await generate_chunked_script(
@@ -75,6 +87,14 @@ class ScriptWriterAgent(Agent):
         )
 
         word_count = self._word_count(script)
+
+        if is_study_mode(state) and word_count < min_words:
+            script = await self._targeted_expand_study_script(
+                state=state,
+                script=script,
+                missing_words=min_words - word_count,
+            )
+            word_count = self._word_count(script)
 
         severe_shortfall = (
             word_count
@@ -100,9 +120,9 @@ class ScriptWriterAgent(Agent):
         ):
             print(
                 f"[SCRIPT] Length {word_count} words is far below "
-                f"{min_words}-{max_words}. Skipping a second full rewrite "
-                "to avoid filler, unsupported expansion, and duplicate "
-                "Ollama latency. Duration will follow actual narration."
+                f"{min_words}-{max_words} even after targeted section expansion. "
+                "Keeping factual completeness instead of padding with filler; "
+                "final duration will follow actual narration."
             )
 
         elif (
@@ -181,11 +201,87 @@ class ScriptWriterAgent(Agent):
             "actual_minutes": actual_minutes,
             "min_words": min_words,
             "max_words": max_words,
+            "duration_source": grounding.get("duration_source", "strategy"),
+            "strategy_completion_ratio": round(
+                word_count / max(1, target_words), 3
+            ),
         }
 
         state.script = script
         state.status = "script_generated"
         return state
+
+    async def _targeted_expand_study_script(
+        self,
+        *,
+        state: WorkflowState,
+        script: YouTubeScript,
+        missing_words: int,
+    ) -> YouTubeScript:
+        """Expand only thin study sections instead of rewriting the whole script."""
+        if missing_words <= 0 or not script.sections:
+            return script
+
+        ranked = sorted(
+            script.sections,
+            key=lambda section: len(
+                re.findall(r"\b[\w@./+-]+\b", section.content)
+            ),
+        )[: min(3, len(script.sections))]
+        candidates = "\n\n".join(
+            f"SECTION: {section.title}\n{section.content}" for section in ranked
+        )
+        requested = min(max(missing_words, 120), 900)
+        prompt = f"""
+The approved study strategy requires more teaching depth, but the current script is short.
+Add approximately {requested} NEW spoken words across ONLY the listed sections.
+
+TOPIC: {state.strategy.topic if state.strategy else state.topic}
+TARGET AUDIENCE: {state.strategy.audience if state.strategy else ''}
+
+THIN SECTIONS
+{candidates}
+
+RULES
+1. Return additions only; do not rewrite or delete existing narration.
+2. section_title must exactly match one title shown above.
+3. Deepen mechanisms, worked traces, theory-to-code mapping, verification, or concrete edge cases.
+4. Do not add filler, repeated definitions, hype, current statistics, release claims, quotations, or unsupported facts.
+5. Keep beginner-friendly spoken English and connect naturally from the existing section.
+6. Total new narration should be close to {requested} words.
+"""
+        try:
+            expansion = await self._llm.generate_structured(
+                prompt,
+                _TargetedExpansion,
+                system_prompt=(
+                    "You expand only underdeveloped sections of an approved educational "
+                    "script. Preserve factual boundaries and return structured JSON only."
+                ),
+            )
+        except Exception as exc:
+            print(
+                "[SCRIPT DEPTH] targeted expansion unavailable: "
+                f"{exc.__class__.__name__}; keeping factual draft"
+            )
+            return script
+
+        by_title = {section.title: section for section in script.sections}
+        added_words = 0
+        for addition in expansion.additions:
+            section = by_title.get(addition.section_title)
+            text = addition.added_narration.strip()
+            if section is None or not text:
+                continue
+            section.content = section.content.rstrip() + " " + text
+            added_words += len(re.findall(r"\b[\w@./+-]+\b", text))
+
+        if added_words:
+            print(
+                f"[SCRIPT DEPTH] targeted expansion added {added_words} words "
+                f"across {min(len(expansion.additions), 3)} thin section(s)."
+            )
+        return script
 
     def _build_prompt(
         self,
@@ -204,8 +300,27 @@ class ScriptWriterAgent(Agent):
                 f"{current_script.model_dump_json(indent=2)}\n"
             )
 
+        study_mode = is_study_mode(state)
+        grounding_policy = (
+            """
+STUDY MODE GROUNDING
+- This is an evergreen technical lesson. Current trend/news evidence is discovery context, not the lesson outline.
+- You MAY explain stable technical definitions, architecture, algorithms, code behavior, and common engineering practices using established technical knowledge.
+- Do NOT invent fresh/current facts such as release dates, adoption numbers, product launches, benchmark claims, quotations, or company announcements. Use supplied evidence only if such current facts are truly needed.
+- Prefer teaching the underlying concept over discussing news about the concept.
+"""
+            if study_mode
+            else """
+CURRENT-EVENT GROUNDING
+- Treat supplied trend/news evidence as the factual boundary for time-sensitive claims.
+- Do not invent unsupported specifics.
+"""
+        )
+
         return f"""
 Create an accurate YouTube narration script.
+
+{grounding_policy}
 
 APPROVED STRATEGY
 Topic: {strategy.topic}
@@ -237,6 +352,30 @@ YOUTUBE DISCOVERY EVIDENCE
 LANGUAGE AND VOICE-FRIENDLY WRITING
 {self._language_instruction(state)}
 
+SUBJECT-MATTER-EXPERT TEACHING RULES
+1. For educational, technical, coding, AI, automation, architecture, data, science, or engineering topics, teach as a subject-matter expert rather than as a newsreader.
+2. Open with a concrete, informative learner problem plus the mechanism/payoff. Prefer a declarative hook over a rhetorical question. Do not use generic openings such as "Have you ever wondered", "Did you know", "What if", or "Imagine", and do not spend the first lines welcoming viewers or restating the title.
+3. Unless the approved audience is explicitly advanced, assume the viewer is a beginner. Immediately after the hook, give THEORY FIRST as exactly three short declarative ideas: (1) plain-language definition, (2) key idea/distinction, (3) why it matters/usefulness. Only after those three points may the detailed mechanism or flow begin.
+4. Establish the mental model before implementation detail: WHY the mechanism works, WHAT changes, then HOW to implement or verify it.
+5. For AI topics, define specialized terms (for example retrieval, embedding, context window, agent, tool call, evaluation) before relying on them. Explain the data/control flow before code or framework names.
+6. Prefer short spoken sentences with deliberate transitions. Dense code, formulas, commands, metrics, or architecture steps must be surrounded by plain-language explanation.
+5. When useful, include one misconception, failure mode, boundary condition, or tradeoff. Do not invent one when evidence is insufficient.
+6. End technical sections with a verification idea: a test, observation, prediction, or check the viewer can perform.
+7. Avoid hype, filler, generic motivational claims, and unsupported superlatives.
+8. Keep terminology precise and consistent. Define an acronym or specialized term the first time it matters to understanding.
+9. For tutorial-style topics, organize the learning arc as: problem/hook → plain-language theory → one simple analogy or mental model when useful → worked example or flow → implementation/details → verification → concrete edge cases/tradeoffs → recap/practice.
+10. BEGINNER MINI-ARC INSIDE EACH SUBSTANTIVE SECTION: first explain WHAT the concept means as 2-3 short theory points using plain language; only after that explain HOW IT FLOWS as a concrete cause → action → result sequence. Then add one example/implementation or verification point when useful. Do not open a section with a diagram-like list of components before defining the idea.
+11. When code is shown, explicitly connect the visual/theoretical step to the exact variable, branch, function, or line that implements it. Never drop code on screen without explaining what earlier reasoning it represents.
+12. Give concrete beginner-friendly edge examples instead of naming edge-case categories only. For example, show what should happen for an empty input, one-item input, missing result, or boundary value when those cases apply.
+
+STUDY ENGAGEMENT CONTRACT
+For study lessons: use the first 35 spoken words to show a concrete failure or
+surprising result and promise one demonstrable skill. Pay off that promise in
+the worked example; never invent metrics or use clickbait. Do not force quiz questions, pause-and-predict prompts, or rhetorical questions between sections.
+Maintain engagement through concrete examples, visible cause/effect, small reveals, and clear transitions.
+Finish with an optional transfer exercise using a changed input and a way to verify it.
+Keep these activities inside the approved duration/word budget.
+
 VOICE / CHARACTER RULES
 1. Write for natural spoken delivery, not formal article prose.
 2. The main narrator should remain the primary storyteller.
@@ -259,15 +398,14 @@ VOICE / CHARACTER RULES
    metadata unless that metric is itself the subject of the video.
 
 STRICT GROUNDING RULES
-0. First establish what the topic actually IS from the evidence. Do not turn
+0. First establish what the topic actually IS. In study mode, use the topic, authoritative fact pack, and stable technical knowledge; in current-event mode, use the supplied evidence. Do not turn
    an action/crime movie into a historical film, a sports fixture into a
    transfer story, or a legal petition into a political event. If topic
    identity is uncertain, use conservative wording.
 1. Never invent a date, person, channel, organization, quote, leak source,
    company statement, release detail, gameplay detail, statistic, motive,
    consequence, or causal impact.
-2. An exact factual detail may be stated only when the supplied evidence
-   explicitly contains that detail.
+2. A time-sensitive or event-specific factual detail may be stated only when the supplied evidence explicitly contains it. Stable technical fundamentals in study mode may be explained from established technical knowledge.
 3. A YouTube video's upload date proves only when that video was uploaded;
    it does NOT prove when the underlying event happened.
 4. A YouTube title is discovery/context evidence, not authoritative proof.
@@ -277,8 +415,7 @@ STRICT GROUNDING RULES
 6. Never claim that a company responded, acknowledged something, changed its
    strategy, or changed a product because of an event unless evidence says so.
 7. Never infer that leaks/feedback changed a final design or release plan.
-8. If evidence is thin, explain only what is known and label uncertainty.
-   It is better to be cautious than to fill eight minutes with invented facts.
+8. If current-event evidence is thin, omit unsupported current claims. In study mode, continue with stable concept teaching, examples, code, verification, and limitations instead of filling the lesson with news uncertainty.
 9. Do not repeat the conclusion as a numbered section and then repeat it again
    in the conclusion field. Use the sections for substantive content only.
 10. Return only the required JSON schema.
@@ -305,6 +442,21 @@ STRICT GROUNDING RULES
                 "sentence must remain Hindi."
             )
 
+        locale = str(
+            state.metadata.get("target_locale", "") or ""
+        ).strip().replace("-", "_").lower()
+
+        if locale == "en_us" or "united states" in target.lower():
+            return (
+                "Narration language: English (United States). "
+                "Use natural American English spelling, vocabulary, rhythm, and "
+                "examples. Prefer forms such as color, center, analyze, and "
+                "program when context permits. Define technical jargon before "
+                "using it, keep sentences easy to speak aloud, and do not drift "
+                "into another regional English variety unless a proper noun or "
+                "quoted technical term requires it."
+            )
+
         return (
             f"Narration language: {target}. "
             "Keep ALL viewer-facing narration naturally in this selected "
@@ -323,8 +475,11 @@ STRICT GROUNDING RULES
 
         aliases = {
             "en": "English",
-            "en_us": "English",
+            "en_us": "English (United States)",
+            "en-us": "English (United States)",
             "english": "English",
+            "en_gb": "English (United Kingdom)",
+            "en-gb": "English (United Kingdom)",
             "hi": "Hindi (India)",
             "hi_in": "Hindi (India)",
             "hindi": "Hindi (India)",
@@ -468,17 +623,44 @@ STRICT GROUNDING RULES
         if "playwright" in normalized and "mcp" in normalized:
             return """
 - MCP means Model Context Protocol.
-- MCP is an open standard for connecting AI applications with tools/data.
+- MCP is an open protocol for connecting AI applications with external context/capabilities.
 - Playwright MCP is an MCP server providing browser automation with Playwright.
-- It enables LLMs to interact with pages using structured accessibility snapshots.
-- Standard setup uses: npx @playwright/mcp@latest
-- Node.js 20+ and an MCP client are standard prerequisites.
+- It can expose browser interaction through structured page/accessibility information.
+- A common setup command is: npx @playwright/mcp@latest
+- An MCP client is required.
 - TypeScript and GitHub Copilot are not universal prerequisites.
 - Planner, Generator, and Healer are not established built-in Playwright MCP agents.
 """
+        if "model context protocol" in normalized or normalized.strip() == "mcp" or " mcp" in normalized:
+            return """
+- MCP means Model Context Protocol.
+- MCP standardizes how an AI application can connect to external context and capabilities.
+- The architecture is commonly described using hosts, clients, and servers.
+- MCP servers can expose tools, resources, and prompts to clients.
+- Tools represent callable actions; resources expose readable context/data; prompts provide reusable prompt templates.
+- MCP uses structured protocol messages and JSON-RPC 2.0 semantics.
+- Permissions, input validation, output validation, and testing are still required; MCP does not make tools automatically safe.
+"""
+        if "rag" in normalized or "retrieval augmented" in normalized:
+            return """
+- RAG means retrieval-augmented generation.
+- RAG retrieves external information and adds it to the model's context before generation.
+- Embeddings are a common method for semantic retrieval.
+- Vector databases are common but not mandatory; other search/retrieval systems can be used.
+- Retrieval quality and generation quality should be evaluated separately.
+- RAG does not guarantee factual correctness.
+"""
+        if "ai agent" in normalized or "agents" in normalized:
+            return """
+- An AI agent can use a model to choose actions/tools while working toward a task.
+- Tools can expose APIs, search, databases, browser actions, code execution, or business operations.
+- Persistent memory is optional, not a requirement for every agent.
+- Agent testing should cover tool choice, arguments, ordering, completion, error handling, permissions, and unsafe instructions.
+"""
         return (
-            "No special fact pack is configured. "
-            "Use only the supplied trend/news/YouTube evidence."
+            "No special fact pack is configured. In study mode, use established "
+            "technical knowledge for stable fundamentals and avoid unsupported "
+            "time-sensitive claims."
         )
 
     @staticmethod

@@ -156,7 +156,7 @@ class AnimateDiffMotionBackend:
         ]
         env = os.environ.copy()
         env.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
-        env.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", "0.0")
+        env.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", "1.0")
         print("[MOTION AD V19.5]", " ".join(cmd[:8]), "...")
         subprocess.run(cmd, check=True, env=env)
         if not out.exists() or out.stat().st_size < 1024:
